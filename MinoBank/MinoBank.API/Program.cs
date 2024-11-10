@@ -1,5 +1,11 @@
+using Microsoft.EntityFrameworkCore;
+using MinoBank.Infrastructure.Data;
+
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddDbContext<MinoBankDbContext>(options =>{
+    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MinoBankDbContext)));
+});
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
