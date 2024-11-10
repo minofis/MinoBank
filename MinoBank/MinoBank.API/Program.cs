@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore;
+using MinoBank.Core.Interfaces;
 using MinoBank.Infrastructure.Data;
+using MinoBank.Infrastructure.Data.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<MinoBankDbContext>(options =>{
     options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MinoBankDbContext)));
 });
-builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddSwaggerGen();
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -18,4 +21,5 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.MapControllers();
 app.Run();
