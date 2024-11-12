@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using MinoBank.Core.Interfaces;
+using MinoBank.Core.Interfaces.Repositories;
 using MinoBank.Infrastructure.Data;
 using MinoBank.Infrastructure.Data.Repositories;
 

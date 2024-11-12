@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos;
 using MinoBank.Core.Entities;
-using MinoBank.Core.Interfaces;
+using MinoBank.Core.Interfaces.Repositories;
 
 namespace MinoBank.API.Controllers
 {

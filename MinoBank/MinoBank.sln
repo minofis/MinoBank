@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinoBank.Core", "MinoBank.C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinoBank.API", "MinoBank.API\MinoBank.API.csproj", "{46356202-2F40-4A62-A837-BFDD6D0A45F8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinoBank.Business", "MinoBank.Business\MinoBank.Business.csproj", "{5E6175F6-E147-41DB-AD38-3F57DB1E86A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +32,9 @@ Global
 		{46356202-2F40-4A62-A837-BFDD6D0A45F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46356202-2F40-4A62-A837-BFDD6D0A45F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46356202-2F40-4A62-A837-BFDD6D0A45F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E6175F6-E147-41DB-AD38-3F57DB1E86A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E6175F6-E147-41DB-AD38-3F57DB1E86A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E6175F6-E147-41DB-AD38-3F57DB1E86A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E6175F6-E147-41DB-AD38-3F57DB1E86A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

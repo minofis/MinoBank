@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MinoBank.Infrastructure\MinoBank.Infrastructure.csproj" />
+    <ProjectReference Include="..\MinoBank.Business\MinoBank.Business.csproj" />
   </ItemGroup>
 
 </Project>
