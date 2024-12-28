@@ -3,8 +3,6 @@ namespace MinoBank.Core.Enums.Transactions
     public enum TransactionCurrencyCode
     {
         EUR,
-        USD,
-        RUB,
-        UAH
+        USD
     }
 }

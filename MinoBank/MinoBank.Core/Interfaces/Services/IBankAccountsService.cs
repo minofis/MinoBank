@@ -5,9 +5,12 @@ namespace MinoBank.Core.Interfaces.Services
 {
     public interface IBankAccountsService
     {
+        Task<List<BankAccount>> GetAllBankAccountsAsync();
+        Task<BankAccount> GetBankAccountByIdAsync(Guid bankAccountId);
+        Task<BankAccountDetails> GetBankAccountDetailsByIdAsync(Guid bankAccountId);
         Task CreateBankAccountAsync(BankAccount bankAccount);
-        Task<bool> DeleteBankAccountByIdAsync(int bankAccountId);
-        Task<BankAccountDetails> GetBankAccountDetailsByIdAsync(int bankAccountId);
-        Task ChangeBankAccountStatusByIdAsync(int bankAccountId, BankAccountStatus newStatus);
+        Task DeleteBankAccountByIdAsync(Guid bankAccountId);
+        Task UpdateBankAccountStatusByIdAsync(Guid bankAccountId, BankAccountStatus newStatus);
+        Task UpdateBankAccountTypeByIdAsync(Guid bankAccountId, BankAccountType newType);
     }
 }

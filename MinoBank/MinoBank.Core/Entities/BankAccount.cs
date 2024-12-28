@@ -4,9 +4,9 @@ namespace MinoBank.Core.Entities
 {
     public class BankAccount : BaseEntity
     {
-        public string BankName { get; set; } = string.Empty;
-        public BankAccountStatus Status { get; set; }
-        public List<BankCard> BankCards { get; set; }
+        public BankAccountStatus Status { get; set; } = BankAccountStatus.Active;
+        public BankAccountType Type { get; set; } = BankAccountType.Standart;
+        public List<BankCard> BankCards { get; set; } = new List<BankCard>();
         public BankAccountDetails Details { get; set; }
     }
 }

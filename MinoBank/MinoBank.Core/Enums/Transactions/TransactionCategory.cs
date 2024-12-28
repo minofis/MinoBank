@@ -4,6 +4,7 @@ namespace MinoBank.Core.Enums.Transactions
     {
         Remittance,
         Charity,
-        Salary
+        Salary,
+        MobileService
     }
 }

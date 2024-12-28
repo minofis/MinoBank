@@ -5,9 +5,9 @@ namespace MinoBank.Core.Interfaces.Repositories
     public interface IUsersRepository
     {
         Task<List<User>> GetAllUsersAsync();
-        Task<User> GetUserByIdAsync(int userId);
+        Task<User> GetUserByIdAsync(Guid userId);
         Task CreateUserAsync(User user);
-        Task DeleteUserByIdAsync(int userId);
-        Task UpdateUserByIdAsync(int userId, User user);
+        Task DeleteUserByIdAsync(Guid userId);
+        Task UpdateUserByIdAsync(Guid userId, User user);
     }
 }

@@ -6,10 +6,10 @@ namespace MinoBank.Core.Interfaces.Services
     public interface IBankCardsService
     {
         Task CreateBankCardAsync(BankCard bankCard);
-        Task<BankCardDetails> GetBankCardDetailsByIdAsync(int bankCardId);
-        Task<bool> DeleteBankCardByIdAsync(int bankCardId);
-        Task ChangeBankCardStatusByIdAsync(int bankCardId, BankCardStatus newStatus);
-        Task ChangeBankCardLimitByIdAsync(int bankCardId, decimal newLimit, BankCardLimitType limitType);
-        Task ChangeBankCardPinCodeByIdAsync(int bankCardId, string newPinCode);
+        Task<BankCardDetails> GetBankCardDetailsByIdAsync(Guid bankCardId);
+        Task<bool> DeleteBankCardByIdAsync(Guid bankCardId);
+        Task ChangeBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus);
+        Task ChangeBankCardLimitByIdAsync(Guid bankCardId, decimal newLimit, BankCardLimitType limitType);
+        Task ChangeBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode);
     }
 }

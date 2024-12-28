@@ -11,26 +11,26 @@ namespace MinoBank.Business.Services
             throw new NotImplementedException();
         }
 
-        public Task<BankCardDetails> GetBankCardDetailsByIdAsync(int bankCardId)
+        public Task<BankCardDetails> GetBankCardDetailsByIdAsync(Guid bankCardId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteBankCardByIdAsync(int bankCardId)
+        public Task<bool> DeleteBankCardByIdAsync(Guid bankCardId)
         {
             throw new NotImplementedException();
         }
 
-        public Task ChangeBankCardStatusByIdAsync(int bankCardId, BankCardStatus newStatus)
+        public Task ChangeBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus)
         {
             throw new NotImplementedException();
         }
 
-        public Task ChangeBankCardLimitByIdAsync(int bankCardId, decimal newLimit, BankCardLimitType limitType)
+        public Task ChangeBankCardLimitByIdAsync(Guid bankCardId, decimal newLimit, BankCardLimitType limitType)
         {
             throw new NotImplementedException();
         }
-        public Task ChangeBankCardPinCodeByIdAsync(int bankCardId, string newPinCode)
+        public Task ChangeBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode)
         {
             throw new NotImplementedException();
         }

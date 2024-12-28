@@ -16,12 +16,14 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUsers(){
+        public async Task<ActionResult<List<User>>> GetAllUsers()
+        {
             return await _usersRepo.GetAllUsersAsync();
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(int id){
+        public async Task<ActionResult<User>> GetUserById(Guid id)
+        {
             var user = await _usersRepo.GetUserByIdAsync(id);
             if(user == null){
                 return BadRequest();
@@ -31,24 +33,28 @@ namespace MinoBank.API.Controllers
 
         [HttpPost]
         [Route("Create")]
-        public async Task CreateUser([FromBody]UserCreateRequestDto userDto){
+        public async Task CreateUser([FromBody]UserCreateRequestDto userDto)
+        {
             var user = new User{
                 Username = userDto.Username,
                 Email = userDto.Email,
-                Password = userDto.Password
+                Password = userDto.Password,
+                CreationDate = DateTime.Now
             };
             await _usersRepo.CreateUserAsync(user);
         }
 
         [HttpDelete]
         [Route("Delete/{id}")]
-        public async Task DeleteUserById(int id){
+        public async Task DeleteUserById(Guid id)
+        {
             await _usersRepo.DeleteUserByIdAsync(id);
         }
 
         [HttpPut]
         [Route("Update/{id}")]
-        public async Task UpdateUserById(int id, UserCreateRequestDto userDto){
+        public async Task UpdateUserById(Guid id, UserCreateRequestDto userDto)
+        {
             var user = new User{
                 Username = userDto.Username,
                 Email = userDto.Email,
