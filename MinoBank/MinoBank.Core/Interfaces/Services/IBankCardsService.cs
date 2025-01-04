@@ -8,6 +8,7 @@ namespace MinoBank.Core.Interfaces.Services
         Task<List<BankCard>> GetAllBankCardsAsync();
         Task<BankCard> GetBankCardByIdAsync(Guid bankCardId);
         Task<BankCardDetails> GetBankCardDetailsByIdAsync(Guid bankCardId);
+        Task TopUpBankCardByIdAsync(Guid bankCardId, BankTransaction newBankTransaction);
         Task CreateBankCardAsync(BankCard newBankCard);
         Task DeleteBankCardByIdAsync(Guid bankCardId);
         Task UpdateBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus);

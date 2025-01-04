@@ -8,9 +8,11 @@ namespace MinoBank.Business.Services
     public class BankCardsService : IBankCardsService
     {
         private readonly IBankCardsRepository _bankCardsRepo;
-        public BankCardsService(IBankCardsRepository bankCardsRepo)
+        private readonly IBankTransactionsRepository _bankTransactionsRepo;
+        public BankCardsService(IBankCardsRepository bankCardsRepo, IBankTransactionsRepository bankTransactionsRepo)
         {
             _bankCardsRepo = bankCardsRepo;
+            _bankTransactionsRepo = bankTransactionsRepo;
         }
         
         public async Task<List<BankCard>> GetAllBankCardsAsync()
@@ -52,6 +54,35 @@ namespace MinoBank.Business.Services
         public async Task UpdateBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus)
         {
             await _bankCardsRepo.UpdateBankCardStatusByIdAsync(bankCardId, newStatus);
+        }
+
+        public async Task TopUpBankCardByIdAsync(Guid bankCardId, BankTransaction newBankTransaction)
+        {
+            // Get bank card by id
+            var bankCard = await _bankCardsRepo.GetBankCardByIdAsync(bankCardId)
+                ?? throw new ArgumentException($"Bank card with ID {bankCardId} not found");
+
+            // Create bank transaction
+            var bankTransaction = new BankTransaction
+            {
+                Name = $"Top-up for {bankCard.Details.OwnerName}",
+                CurrencyCode = newBankTransaction.CurrencyCode,
+                Type = newBankTransaction.Type,
+                Description = "Funds added to bank card balance",
+                Amount = newBankTransaction.Amount,
+                SenderBankCardId = Guid.Empty,
+                RecipientBankCardId = bankCard.Id
+            };
+
+            // Update balance
+            bankCard.Balance += bankTransaction.Amount;
+
+            // Add bank transaction to bank card
+            bankCard.RecivedTransactions.Add(bankTransaction);
+
+            // Save changes
+            await _bankTransactionsRepo.CreateBankTransactionAsync(bankTransaction);
+            await _bankCardsRepo.SaveChangesAsync();
         }
     }
 }

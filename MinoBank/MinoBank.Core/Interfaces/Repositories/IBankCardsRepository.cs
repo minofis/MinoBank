@@ -12,5 +12,6 @@ namespace MinoBank.Core.Interfaces.Repositories
         Task UpdateBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus);
         Task UpdateBankCardDailyLimitByIdAsync(Guid bankCardId, decimal newDailyLimit);
         Task UpdateBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode);
+        Task SaveChangesAsync();
     }
 }

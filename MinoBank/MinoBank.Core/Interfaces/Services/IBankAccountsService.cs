@@ -10,7 +10,6 @@ namespace MinoBank.Core.Interfaces.Services
         Task<BankAccount> GetBankAccountByIdAsync(Guid bankAccountId);
         Task<BankAccountDetails> GetBankAccountDetailsByIdAsync(Guid bankAccountId);
         Task<List<BankCard>> GetBankCardsByIdAsync(Guid bankAccountId);
-        // Task TopUpBankCardByNumberAsync(Guid bankAccountId, BankTransaction newBankTransaction);
         Task TransferMoneyToBankCardByNumberAsync(Guid bankAccountId, BankTransaction newBankTransaction, string senderBankCardNumber, string recipientBankCardNumber);
         Task CreateBankAccountAsync(BankAccount bankAccount);
         Task CreateBankCardByIdAsync(Guid bankAccountId, BankCardType bankCardType, BankCardCurrencyCode currencyCode);
