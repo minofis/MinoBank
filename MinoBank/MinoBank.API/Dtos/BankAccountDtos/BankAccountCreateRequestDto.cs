@@ -1,6 +1,6 @@
-using MinoBank.Core.Enums.BankAccounts;
+using MinoBank.Core.Enums.BankAccount;
 
-namespace MinoBank.API.Dtos
+namespace MinoBank.API.Dtos.BankAccountDtos
 {
     public class BankAccountCreateRequestDto
     {

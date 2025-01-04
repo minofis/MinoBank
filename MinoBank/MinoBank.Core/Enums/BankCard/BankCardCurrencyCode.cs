@@ -1,4 +1,4 @@
-namespace MinoBank.Core.Enums.BankCards
+namespace MinoBank.Core.Enums.BankCard
 {
     public enum BankCardCurrencyCode
     {

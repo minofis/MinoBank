@@ -1,15 +1,17 @@
 using MinoBank.Core.Entities;
-using MinoBank.Core.Enums.BankCards;
+using MinoBank.Core.Enums.BankCard;
 
 namespace MinoBank.Core.Interfaces.Services
 {
     public interface IBankCardsService
     {
-        Task CreateBankCardAsync(BankCard bankCard);
+        Task<List<BankCard>> GetAllBankCardsAsync();
+        Task<BankCard> GetBankCardByIdAsync(Guid bankCardId);
         Task<BankCardDetails> GetBankCardDetailsByIdAsync(Guid bankCardId);
-        Task<bool> DeleteBankCardByIdAsync(Guid bankCardId);
-        Task ChangeBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus);
-        Task ChangeBankCardLimitByIdAsync(Guid bankCardId, decimal newLimit, BankCardLimitType limitType);
-        Task ChangeBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode);
+        Task CreateBankCardAsync(BankCard newBankCard);
+        Task DeleteBankCardByIdAsync(Guid bankCardId);
+        Task UpdateBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus);
+        Task UpdateBankCardDailyLimitByIdAsync(Guid bankCardId, decimal newDailyLimit);
+        Task UpdateBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode);
     }
 }

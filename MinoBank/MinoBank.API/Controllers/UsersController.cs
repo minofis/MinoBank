@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MinoBank.API.Dtos;
+using MinoBank.API.Dtos.UserDtos;
 using MinoBank.Core.Entities;
 using MinoBank.Core.Interfaces.Repositories;
 

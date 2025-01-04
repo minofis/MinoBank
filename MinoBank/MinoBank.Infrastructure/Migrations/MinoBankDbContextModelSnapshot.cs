@@ -78,34 +78,28 @@ namespace MinoBank.Infrastructure.Migrations
                     b.Property<decimal>("DailyLimit")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<Guid>("DetailsId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<decimal>("MonthlyLimit")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int>("PinCode")
-                        .HasColumnType("int");
+                    b.Property<string>("PinCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BankAccountId");
 
-                    b.HasIndex("DetailsId")
-                        .IsUnique();
-
                     b.ToTable("BankCards");
                 });
 
             modelBuilder.Entity("MinoBank.Core.Entities.BankCardDetails", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("BankCardId")
                         .HasColumnType("uniqueidentifier");
 
@@ -131,12 +125,12 @@ namespace MinoBank.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
+                    b.HasKey("BankCardId");
 
                     b.ToTable("BankCardDetails");
                 });
 
-            modelBuilder.Entity("MinoBank.Core.Entities.Transaction", b =>
+            modelBuilder.Entity("MinoBank.Core.Entities.BankTransaction", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -144,9 +138,6 @@ namespace MinoBank.Infrastructure.Migrations
 
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid?>("BankCardId")
-                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Category")
                         .HasColumnType("int");
@@ -168,14 +159,30 @@ namespace MinoBank.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("RecipientBankCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RecipientBankCardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("SenderBankCardId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("SenderBankCardNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BankCardId");
+                    b.HasIndex("RecipientBankCardId");
 
-                    b.ToTable("Transactions");
+                    b.HasIndex("SenderBankCardId");
+
+                    b.ToTable("BankTransactions");
                 });
 
             modelBuilder.Entity("MinoBank.Core.Entities.User", b =>
@@ -223,40 +230,55 @@ namespace MinoBank.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MinoBank.Core.Entities.BankCardDetails", "Details")
-                        .WithOne("BankCard")
-                        .HasForeignKey("MinoBank.Core.Entities.BankCard", "DetailsId")
+                    b.Navigation("BankAccount");
+                });
+
+            modelBuilder.Entity("MinoBank.Core.Entities.BankCardDetails", b =>
+                {
+                    b.HasOne("MinoBank.Core.Entities.BankCard", "BankCard")
+                        .WithOne("Details")
+                        .HasForeignKey("MinoBank.Core.Entities.BankCardDetails", "BankCardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("BankAccount");
-
-                    b.Navigation("Details");
+                    b.Navigation("BankCard");
                 });
 
-            modelBuilder.Entity("MinoBank.Core.Entities.Transaction", b =>
+            modelBuilder.Entity("MinoBank.Core.Entities.BankTransaction", b =>
                 {
-                    b.HasOne("MinoBank.Core.Entities.BankCard", null)
-                        .WithMany("Transactions")
-                        .HasForeignKey("BankCardId");
+                    b.HasOne("MinoBank.Core.Entities.BankCard", "RecipientBankCard")
+                        .WithMany("RecivedTransactions")
+                        .HasForeignKey("RecipientBankCardId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MinoBank.Core.Entities.BankCard", "SenderBankCard")
+                        .WithMany("SentTransactions")
+                        .HasForeignKey("SenderBankCardId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("RecipientBankCard");
+
+                    b.Navigation("SenderBankCard");
                 });
 
             modelBuilder.Entity("MinoBank.Core.Entities.BankAccount", b =>
                 {
                     b.Navigation("BankCards");
 
-                    b.Navigation("Details");
+                    b.Navigation("Details")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("MinoBank.Core.Entities.BankCard", b =>
                 {
-                    b.Navigation("Transactions");
-                });
-
-            modelBuilder.Entity("MinoBank.Core.Entities.BankCardDetails", b =>
-                {
-                    b.Navigation("BankCard")
+                    b.Navigation("Details")
                         .IsRequired();
+
+                    b.Navigation("RecivedTransactions");
+
+                    b.Navigation("SentTransactions");
                 });
 #pragma warning restore 612, 618
         }

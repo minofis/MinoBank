@@ -1,10 +1,11 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using MinoBank.API.Dtos;
-using MinoBank.API.Dtos.BankAccount;
-using MinoBank.API.Dtos.BankAccountDetails;
+using MinoBank.API.Dtos.BankAccountDtos;
+using MinoBank.API.Dtos.BankCardDtos;
+using MinoBank.API.Dtos.BankTransactionDtos;
 using MinoBank.Core.Entities;
-using MinoBank.Core.Enums.BankAccounts;
+using MinoBank.Core.Enums.BankAccount;
+using MinoBank.Core.Enums.BankCard;
 using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.API.Controllers
@@ -42,7 +43,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpGet]
-        [Route("Details/{id}")]
+        [Route("{id}/Details")]
         public async Task<ActionResult<BankAccountDetailsResponseDto>> GetBankAccountDetailsById(Guid id)
         {
             var bankAccountDetails = await _bankAccountsService.GetBankAccountDetailsByIdAsync(id);
@@ -52,6 +53,19 @@ namespace MinoBank.API.Controllers
             }
             var bankAccountDetailsResponseDto = _mapper.Map<BankAccountDetailsResponseDto>(bankAccountDetails);
             return Ok(bankAccountDetailsResponseDto);
+        }
+
+        [HttpGet]
+        [Route("{id}/BankCards")]
+        public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCardsById(Guid id)
+        {
+            var bankCards = await _bankAccountsService.GetBankCardsByIdAsync(id);
+            if(bankCards == null)
+            {
+                return NotFound($"Bank account with ID {id} not found");
+            }
+            var bankCardsDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
+            return Ok(bankCardsDtos);
         }
 
         [HttpPost]
@@ -79,8 +93,73 @@ namespace MinoBank.API.Controllers
             };
         }
 
+        [HttpPost]
+        [Route("{id}/TransferMoney")]
+        public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToBankCardByNumber(Guid id, [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
+        {
+            var senderBankCardNumber = bankTransactionDto.SenderBankCardNumber;
+            var recipientBankCardNumber = bankTransactionDto.RecipientBankCardNumber;
+            if (bankTransactionDto == null)
+            {
+                return BadRequest("Bank transaction data is required");
+            }
+            if (string.IsNullOrEmpty(recipientBankCardNumber))
+            {
+                return BadRequest("Recipient bank card number is required");
+            }
+            if (string.IsNullOrEmpty(senderBankCardNumber))
+            {
+                return BadRequest("Recipient bank card number is required");
+            }
+            if (bankTransactionDto.Amount == 0)
+            {
+                return BadRequest("Money amount is required");
+            }
+            try
+            {
+                var bankTransaction = _mapper.Map<BankTransaction>(bankTransactionDto);
+                await _bankAccountsService.TransferMoneyToBankCardByNumberAsync(id, bankTransaction, senderBankCardNumber, recipientBankCardNumber);
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
+        }
+
+        [HttpPost]
+        [Route("{id}/BankCards/Create")]
+        public async Task<ActionResult<BankCardResponseDto>> CreateBankCard(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
+        {
+            if (bankCardType == null)
+            {
+                return BadRequest("Bank card type is required");
+            }
+            if (currencyCode == null)
+            {
+                return BadRequest("Bank card type is required");
+            }
+            try
+            {
+                await _bankAccountsService.CreateBankCardByIdAsync(id, bankCardType, currencyCode);
+                return NoContent();
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
+        }
+
         [HttpDelete]
-        [Route("Delete/{id}")]
+        [Route("{id}/Delete")]
         public async Task<ActionResult> DeleteBankAccountById(Guid id)
         {
             try
@@ -90,17 +169,16 @@ namespace MinoBank.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return NotFound(ex. Message);
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
-
         }
 
         [HttpPut]
-        [Route("UpdateStatus/{id}")]
+        [Route("{id}/UpdateStatus")]
         public async Task<ActionResult> UpdateBankAccountStatusById(Guid id, BankAccountStatus newStatus)
         {
             if (newStatus == null)
@@ -114,30 +192,7 @@ namespace MinoBank.API.Controllers
             }
             catch (ArgumentException ex)
             {
-                return NotFound(ex. Message);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        [HttpPut]
-        [Route("UpdateType/{id}")]
-        public async Task<ActionResult> UpdateBankAccountTypeById(Guid id, BankAccountType newType)
-        {
-            if (newType == null)
-            {
-                return BadRequest("Type is required");
-            }
-            try
-            {
-                await _bankAccountsService.UpdateBankAccountTypeByIdAsync(id, newType);
-                return NoContent();
-            }
-            catch (ArgumentException ex)
-            {
-                return NotFound(ex. Message);
+                return NotFound(ex.Message);
             }
             catch (Exception ex)
             {

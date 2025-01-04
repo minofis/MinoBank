@@ -1,5 +1,6 @@
 using MinoBank.Core.Entities;
-using MinoBank.Core.Enums.BankAccounts;
+using MinoBank.Core.Enums.BankAccount;
+using MinoBank.Core.Enums.BankCard;
 
 namespace MinoBank.Core.Interfaces.Services
 {
@@ -8,9 +9,12 @@ namespace MinoBank.Core.Interfaces.Services
         Task<List<BankAccount>> GetAllBankAccountsAsync();
         Task<BankAccount> GetBankAccountByIdAsync(Guid bankAccountId);
         Task<BankAccountDetails> GetBankAccountDetailsByIdAsync(Guid bankAccountId);
+        Task<List<BankCard>> GetBankCardsByIdAsync(Guid bankAccountId);
+        // Task TopUpBankCardByNumberAsync(Guid bankAccountId, BankTransaction newBankTransaction);
+        Task TransferMoneyToBankCardByNumberAsync(Guid bankAccountId, BankTransaction newBankTransaction, string senderBankCardNumber, string recipientBankCardNumber);
         Task CreateBankAccountAsync(BankAccount bankAccount);
+        Task CreateBankCardByIdAsync(Guid bankAccountId, BankCardType bankCardType, BankCardCurrencyCode currencyCode);
         Task DeleteBankAccountByIdAsync(Guid bankAccountId);
         Task UpdateBankAccountStatusByIdAsync(Guid bankAccountId, BankAccountStatus newStatus);
-        Task UpdateBankAccountTypeByIdAsync(Guid bankAccountId, BankAccountType newType);
     }
 }

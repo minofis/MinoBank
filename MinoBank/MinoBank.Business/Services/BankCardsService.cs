@@ -1,38 +1,57 @@
 using MinoBank.Core.Entities;
-using MinoBank.Core.Enums.BankCards;
+using MinoBank.Core.Enums.BankCard;
+using MinoBank.Core.Interfaces.Repositories;
 using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.Business.Services
 {
     public class BankCardsService : IBankCardsService
     {
-        public Task CreateBankCardAsync(BankCard bankCard)
+        private readonly IBankCardsRepository _bankCardsRepo;
+        public BankCardsService(IBankCardsRepository bankCardsRepo)
         {
-            throw new NotImplementedException();
+            _bankCardsRepo = bankCardsRepo;
+        }
+        
+        public async Task<List<BankCard>> GetAllBankCardsAsync()
+        {
+            return await _bankCardsRepo.GetAllBankCardsAsync();
         }
 
-        public Task<BankCardDetails> GetBankCardDetailsByIdAsync(Guid bankCardId)
+        public async Task<BankCard> GetBankCardByIdAsync(Guid bankCardId)
         {
-            throw new NotImplementedException();
+            return await _bankCardsRepo.GetBankCardByIdAsync(bankCardId);
         }
 
-        public Task<bool> DeleteBankCardByIdAsync(Guid bankCardId)
+        public async Task<BankCardDetails> GetBankCardDetailsByIdAsync(Guid bankCardId)
         {
-            throw new NotImplementedException();
+            var bankCard = await _bankCardsRepo.GetBankCardByIdAsync(bankCardId);
+            return bankCard.Details;
         }
 
-        public Task ChangeBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus)
+        public async Task CreateBankCardAsync(BankCard newBankCard)
         {
-            throw new NotImplementedException();
+            await _bankCardsRepo.CreateBankCardAsync(newBankCard);
         }
 
-        public Task ChangeBankCardLimitByIdAsync(Guid bankCardId, decimal newLimit, BankCardLimitType limitType)
+        public async Task DeleteBankCardByIdAsync(Guid bankCardId)
         {
-            throw new NotImplementedException();
+            await _bankCardsRepo.DeleteBankCardByIdAsync(bankCardId);
         }
-        public Task ChangeBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode)
+
+        public async Task UpdateBankCardDailyLimitByIdAsync(Guid bankCardId, decimal newDailyLimit)
         {
-            throw new NotImplementedException();
+            await _bankCardsRepo.UpdateBankCardDailyLimitByIdAsync(bankCardId, newDailyLimit);
+        }
+
+        public async Task UpdateBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode)
+        {
+            await _bankCardsRepo.UpdateBankCardPinCodeByIdAsync(bankCardId, newPinCode);
+        }
+
+        public async Task UpdateBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus)
+        {
+            await _bankCardsRepo.UpdateBankCardStatusByIdAsync(bankCardId, newStatus);
         }
     }
 }

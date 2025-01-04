@@ -13,8 +13,13 @@ builder.Services.AddDbContext<MinoBankDbContext>(options =>{
 });
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
+builder.Services.AddScoped<IBankCardsRepository, BankCardsRepository>();
+builder.Services.AddScoped<IBankTransactionsRepository, BankTransactionsRepository>();
 builder.Services.AddScoped<IBankAccountsService, BankAccountsService>();
+builder.Services.AddScoped<IBankCardsService, BankCardsService>();
+builder.Services.AddScoped<IBankTransactionsService, BankTransactionsService>();
 builder.Services.AddAutoMapper(typeof(BankAccountProfile));
+builder.Services.AddAutoMapper(typeof(BankCardProfile));
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 

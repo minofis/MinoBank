@@ -1,4 +1,4 @@
-namespace MinoBank.Core.Enums.BankAccounts
+namespace MinoBank.Core.Enums.BankAccount
 {
     public enum BankAccountStatus
     {

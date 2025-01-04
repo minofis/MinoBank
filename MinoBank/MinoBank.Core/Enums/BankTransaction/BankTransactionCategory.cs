@@ -1,6 +1,6 @@
-namespace MinoBank.Core.Enums.Transactions
+namespace MinoBank.Core.Enums.BankTransaction
 {
-    public enum TransactionCategory
+    public enum BankTransactionCategory
     {
         Remittance,
         Charity,

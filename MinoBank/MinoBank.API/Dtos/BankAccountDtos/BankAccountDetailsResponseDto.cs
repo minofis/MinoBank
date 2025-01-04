@@ -1,10 +1,10 @@
-namespace MinoBank.API.Dtos.BankAccountDetails
+namespace MinoBank.API.Dtos.BankAccountDtos
 {
     public class BankAccountDetailsResponseDto
     {
         public string BankName { get; set; } = string.Empty;
         public string OwnerName { get; set; } = string.Empty;
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public string CreationDate { get; set; } = string.Empty;
         public Guid BankAccountId { get; set; }
     }
 }

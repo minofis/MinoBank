@@ -25,24 +25,6 @@ namespace MinoBank.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "BankCardDetails",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CurrencyCode = table.Column<int>(type: "int", nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CvvCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    BankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BankCardDetails", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -83,13 +65,13 @@ namespace MinoBank.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     DailyLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MonthlyLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AnnualLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PinCode = table.Column<int>(type: "int", nullable: false),
-                    BankAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    DetailsId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    PinCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BankAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -100,16 +82,33 @@ namespace MinoBank.Infrastructure.Migrations
                         principalTable: "BankAccounts",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BankCardDetails",
+                columns: table => new
+                {
+                    BankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CurrencyCode = table.Column<int>(type: "int", nullable: false),
+                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CvvCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BankCardDetails", x => x.BankCardId);
                     table.ForeignKey(
-                        name: "FK_BankCards_BankCardDetails_DetailsId",
-                        column: x => x.DetailsId,
-                        principalTable: "BankCardDetails",
+                        name: "FK_BankCardDetails_BankCards_BankCardId",
+                        column: x => x.BankCardId,
+                        principalTable: "BankCards",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Transactions",
+                name: "BankTransactions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -121,16 +120,26 @@ namespace MinoBank.Infrastructure.Migrations
                     Category = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    SenderBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SenderBankCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RecipientBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RecipientBankCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Transactions", x => x.Id);
+                    table.PrimaryKey("PK_BankTransactions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Transactions_BankCards_BankCardId",
-                        column: x => x.BankCardId,
+                        name: "FK_BankTransactions_BankCards_RecipientBankCardId",
+                        column: x => x.RecipientBankCardId,
                         principalTable: "BankCards",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_BankTransactions_BankCards_SenderBankCardId",
+                        column: x => x.SenderBankCardId,
+                        principalTable: "BankCards",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -139,15 +148,14 @@ namespace MinoBank.Infrastructure.Migrations
                 column: "BankAccountId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BankCards_DetailsId",
-                table: "BankCards",
-                column: "DetailsId",
-                unique: true);
+                name: "IX_BankTransactions_RecipientBankCardId",
+                table: "BankTransactions",
+                column: "RecipientBankCardId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Transactions_BankCardId",
-                table: "Transactions",
-                column: "BankCardId");
+                name: "IX_BankTransactions_SenderBankCardId",
+                table: "BankTransactions",
+                column: "SenderBankCardId");
         }
 
         /// <inheritdoc />
@@ -157,7 +165,10 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "BankAccountDetails");
 
             migrationBuilder.DropTable(
-                name: "Transactions");
+                name: "BankCardDetails");
+
+            migrationBuilder.DropTable(
+                name: "BankTransactions");
 
             migrationBuilder.DropTable(
                 name: "Users");
@@ -167,9 +178,6 @@ namespace MinoBank.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "BankAccounts");
-
-            migrationBuilder.DropTable(
-                name: "BankCardDetails");
         }
     }
 }

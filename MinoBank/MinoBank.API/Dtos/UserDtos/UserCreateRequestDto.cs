@@ -1,4 +1,4 @@
-namespace MinoBank.API.Dtos
+namespace MinoBank.API.Dtos.UserDtos
 {
     public class UserCreateRequestDto
     {
