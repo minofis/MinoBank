@@ -23,7 +23,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<BankAccountResponseDto>>> GetAllBankAccounts()
+        public async Task<ActionResult<List<BankAccountResponseDto>>> GetBankAccounts()
         {
             // Get all bank accounts
             var bankAccounts = await _bankAccountsService.GetAllBankAccountsAsync();
@@ -36,7 +36,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<BankAccountResponseDto>> GetBankAccountById(Guid id)
+        public async Task<ActionResult<BankAccountResponseDto>> GetBankAccount(Guid id)
         {
             // Get bank account by the specified ID
             var bankAccount = await _bankAccountsService.GetBankAccountByIdAsync(id);
@@ -57,7 +57,7 @@ namespace MinoBank.API.Controllers
 
         [HttpGet]
         [Route("{id}/details")]
-        public async Task<ActionResult<BankAccountDetailsResponseDto>> GetBankAccountDetailsById(Guid id)
+        public async Task<ActionResult<BankAccountDetailsResponseDto>> GetBankAccountDetails(Guid id)
         {
             // Get the bank account details by the specified ID
             var bankAccountDetails = await _bankAccountsService.GetBankAccountDetailsByIdAsync(id);
@@ -77,7 +77,7 @@ namespace MinoBank.API.Controllers
 
         [HttpGet]
         [Route("{id}/bank-cards")]
-        public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCardsById(Guid id)
+        public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCards(Guid id)
         {
             // Get all bank cards associated with the specified bank account ID
             var bankCards = await _bankAccountsService.GetBankCardsByIdAsync(id);
@@ -96,7 +96,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<BankAccountResponseDto>> CreateBankAccount([FromBody]BankAccountCreateRequestDto bankAccountDto)
+        public async Task<ActionResult<BankAccountResponseDto>> Create([FromBody]BankAccountCreateRequestDto bankAccountDto)
         {
             // Validate the incomming request
             if (bankAccountDto == null)
@@ -121,7 +121,7 @@ namespace MinoBank.API.Controllers
                 var bankAccountResponseDto = _mapper.Map<BankAccountResponseDto>(bankAccount);
 
                 // Return a 201 Created response with the bank account
-                return CreatedAtAction(nameof(GetBankAccountById), new {id = bankAccount.Id}, bankAccountResponseDto);
+                return CreatedAtAction(nameof(GetBankAccount), new {id = bankAccount.Id}, bankAccountResponseDto);
             }
             catch(Exception ex)
             {
@@ -132,7 +132,7 @@ namespace MinoBank.API.Controllers
 
         [HttpPost]
         [Route("{id}/transfer-money")]
-        public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToBankCardByNumber(
+        public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToCard(
             Guid id, 
             [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
         {
@@ -191,7 +191,7 @@ namespace MinoBank.API.Controllers
 
         [HttpPost]
         [Route("{id}/bank-cards/create")]
-        public async Task<ActionResult<BankCardResponseDto>> CreateBankCard(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
+        public async Task<ActionResult<BankCardResponseDto>> CreateBankCardForAccount(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
         {
             // Validate the bank card type field
             if (bankCardType == null)
@@ -225,7 +225,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteBankAccountById(Guid id)
+        public async Task<ActionResult> DeleteBankAccount(Guid id)
         {
             try
             {
@@ -249,7 +249,7 @@ namespace MinoBank.API.Controllers
 
         [HttpPut]
         [Route("{id}/status")]
-        public async Task<ActionResult> UpdateBankAccountStatusById(Guid id, BankAccountStatus newStatus)
+        public async Task<ActionResult> UpdateBankAccountStatus(Guid id, BankAccountStatus newStatus)
         {
             // Validate the status field
             if (newStatus == null)
