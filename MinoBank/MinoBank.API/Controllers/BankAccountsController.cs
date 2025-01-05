@@ -11,7 +11,7 @@ using MinoBank.Core.Interfaces.Services;
 namespace MinoBank.API.Controllers
 {
     [ApiController]
-    [Route("MinoBank/[controller]")]
+    [Route("minobank/[controller]")]
     public class BankAccountsController : ControllerBase
     {
         private readonly IMapper _mapper;
@@ -56,7 +56,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/Details")]
+        [Route("{id}/details")]
         public async Task<ActionResult<BankAccountDetailsResponseDto>> GetBankAccountDetailsById(Guid id)
         {
             // Get the bank account details by the specified ID
@@ -76,7 +76,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpGet]
-        [Route("{id}/BankCards")]
+        [Route("{id}/bank-cards")]
         public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCardsById(Guid id)
         {
             // Get all bank cards associated with the specified bank account ID
@@ -96,7 +96,6 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpPost]
-        [Route("Create")]
         public async Task<ActionResult<BankAccountResponseDto>> CreateBankAccount([FromBody]BankAccountCreateRequestDto bankAccountDto)
         {
             // Validate the incomming request
@@ -132,7 +131,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/TransferMoney")]
+        [Route("{id}/transfer-money")]
         public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToBankCardByNumber(
             Guid id, 
             [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
@@ -191,7 +190,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpPost]
-        [Route("{id}/BankCards/Create")]
+        [Route("{id}/bank-cards/create")]
         public async Task<ActionResult<BankCardResponseDto>> CreateBankCard(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
         {
             // Validate the bank card type field
@@ -225,8 +224,7 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpDelete]
-        [Route("{id}/Delete")]
+        [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteBankAccountById(Guid id)
         {
             try
@@ -250,7 +248,7 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpPut]
-        [Route("{id}/UpdateStatus")]
+        [Route("{id}/status")]
         public async Task<ActionResult> UpdateBankAccountStatusById(Guid id, BankAccountStatus newStatus)
         {
             // Validate the status field
