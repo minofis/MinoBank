@@ -150,8 +150,11 @@ namespace MinoBank.API.Controllers
                     senderBankCardNumber, 
                     recipientBankCardNumber);
 
-                // Return a 404 Not Found response
-                return NotFound();
+                // Map the bank transaction entity to a response DTO
+                var bankTransactionResponseDto = _mapper.Map<BankTransactionResponseDto>(bankTransaction);
+
+                // Return a 200 Ok response with the bank transaction
+                return Ok(bankTransactionResponseDto);
             }
             catch (ArgumentException ex)
             {
@@ -174,8 +177,8 @@ namespace MinoBank.API.Controllers
                 // Create bank card service method
                 await _bankAccountsService.CreateBankCardByIdAsync(id, bankCardType, currencyCode);
 
-                // Return a 204 No Content response
-                return NoContent();
+                // Return a 200 Ok response
+                return Ok("Bank card is created successfully");
             }
             catch (ArgumentException ex)
             {
@@ -197,8 +200,8 @@ namespace MinoBank.API.Controllers
                 // Delete bank account service method
                 await _bankAccountsService.DeleteBankAccountByIdAsync(id);
 
-                // Return a 204 No Content response
-                return NoContent();
+                // Return a 200 Ok response
+                return Ok("Bank account is deleted successfully");
             }
             catch (ArgumentException ex)
             {
@@ -226,8 +229,8 @@ namespace MinoBank.API.Controllers
                 // Update bank account status service method
                 await _bankAccountsService.UpdateBankAccountStatusByIdAsync(id, newStatus);
 
-                // Return a 204 No Content response
-                return NoContent();
+                // Return a 200 Ok response
+                return Ok("Bank account status is updated successfully");
             }
             catch (ArgumentException ex)
             {
