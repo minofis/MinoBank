@@ -103,12 +103,6 @@ namespace MinoBank.API.Controllers
             {
                 return BadRequest("Bank account data is required");
             }
-
-            // Validate the owner name field
-            if (string.IsNullOrEmpty(bankAccountDto.OwnerName))
-            {
-                return BadRequest("Owner name is required");
-            }
             try
             {
                 // Map the request DTO to a bank account entity
@@ -144,24 +138,6 @@ namespace MinoBank.API.Controllers
             {
                 return BadRequest("Bank transaction data is required");
             }
-
-            // Validate the recipient bank card number field
-            if (string.IsNullOrEmpty(recipientBankCardNumber))
-            {
-                return BadRequest("Recipient bank card number is required");
-            }
-
-            // Validate the sender bank card number field
-            if (string.IsNullOrEmpty(senderBankCardNumber))
-            {
-                return BadRequest("Recipient bank card number is required");
-            }
-
-            // Validate the amount field
-            if (bankTransactionDto.Amount == 0)
-            {
-                return BadRequest("Money amount is required");
-            }
             try
             {
                 // Map the request DTO to a bank transaction entity
@@ -193,17 +169,6 @@ namespace MinoBank.API.Controllers
         [Route("{id}/bank-cards/create")]
         public async Task<ActionResult<BankCardResponseDto>> CreateBankCardForAccount(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
         {
-            // Validate the bank card type field
-            if (bankCardType == null)
-            {
-                return BadRequest("Bank card type is required");
-            }
-
-            // Validate the currency code field
-            if (currencyCode == null)
-            {
-                return BadRequest("Bank card type is required");
-            }
             try
             {
                 // Create bank card service method
@@ -251,10 +216,10 @@ namespace MinoBank.API.Controllers
         [Route("{id}/status")]
         public async Task<ActionResult> UpdateBankAccountStatus(Guid id, BankAccountStatus newStatus)
         {
-            // Validate the status field
-            if (newStatus == null)
+            // Validate if the status is valid
+            if (!Enum.IsDefined(typeof(BankAccountStatus), newStatus))
             {
-                return BadRequest("Status is required");
+                return BadRequest("Invalid status value");
             }
             try
             {
