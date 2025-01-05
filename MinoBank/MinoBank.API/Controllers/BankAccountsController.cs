@@ -25,20 +25,33 @@ namespace MinoBank.API.Controllers
         [HttpGet]
         public async Task<ActionResult<List<BankAccountResponseDto>>> GetAllBankAccounts()
         {
+            // Get all bank accounts
             var bankAccounts = await _bankAccountsService.GetAllBankAccountsAsync();
+
+            // Map the bank accounts to a list of response DTOs
             var bankAccountResponseDtos = _mapper.Map<List<BankAccountResponseDto>>(bankAccounts);
+
+            // Return 200 status code with the list of bank accounts
             return Ok(bankAccountResponseDtos);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<BankAccountResponseDto>> GetBankAccountById(Guid id)
         {
+            // Get bank account by the specified ID
             var bankAccount = await _bankAccountsService.GetBankAccountByIdAsync(id);
+
+            // If the bank account does not exist, return a 404 Not Found response
             if(bankAccount == null)
             {
+                // Return 404 status code
                 return NotFound($"Bank account with ID {id} not found");
             }
+
+            // Map the bank account entity to response DTO
             var bankAccountResponseDto = _mapper.Map<BankAccountResponseDto>(bankAccount);
+
+            // Return a 200 Ok response with the bank account
             return Ok(bankAccountResponseDto);
         }
 
@@ -46,12 +59,19 @@ namespace MinoBank.API.Controllers
         [Route("{id}/Details")]
         public async Task<ActionResult<BankAccountDetailsResponseDto>> GetBankAccountDetailsById(Guid id)
         {
+            // Get the bank account details by the specified ID
             var bankAccountDetails = await _bankAccountsService.GetBankAccountDetailsByIdAsync(id);
+
+            // If the bank account does not exist, return a 404 Not Found response
             if(bankAccountDetails == null)
             {
                 return NotFound($"Bank account with ID {id} not found");
             }
+
+            // Map the bank account details entity to response DTO
             var bankAccountDetailsResponseDto = _mapper.Map<BankAccountDetailsResponseDto>(bankAccountDetails);
+
+            // Return a 200 Ok response with the bank account details
             return Ok(bankAccountDetailsResponseDto);
         }
 
@@ -59,12 +79,19 @@ namespace MinoBank.API.Controllers
         [Route("{id}/BankCards")]
         public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCardsById(Guid id)
         {
+            // Get all bank cards associated with the specified bank account ID
             var bankCards = await _bankAccountsService.GetBankCardsByIdAsync(id);
+
+            // If the bank account does not exist, return a 404 Not Found response
             if(bankCards == null)
             {
                 return NotFound($"Bank account with ID {id} not found");
             }
+
+            // Map the bank cards to a list of response DTOs
             var bankCardsDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
+
+            // Return a 200 Ok response with the list of bank cards
             return Ok(bankCardsDtos);
         }
 
@@ -72,61 +99,93 @@ namespace MinoBank.API.Controllers
         [Route("Create")]
         public async Task<ActionResult<BankAccountResponseDto>> CreateBankAccount([FromBody]BankAccountCreateRequestDto bankAccountDto)
         {
+            // Validate the incomming request
             if (bankAccountDto == null)
             {
                 return BadRequest("Bank account data is required");
             }
+
+            // Validate the owner name field
             if (string.IsNullOrEmpty(bankAccountDto.OwnerName))
             {
                 return BadRequest("Owner name is required");
             }
             try
             {
+                // Map the request DTO to a bank account entity
                 var bankAccount = _mapper.Map<BankAccount>(bankAccountDto);
+
+                // Create a new bank account 
                 await _bankAccountsService.CreateBankAccountAsync(bankAccount);
+
+                // Map the bank account entity to a response DTO
                 var bankAccountResponseDto = _mapper.Map<BankAccountResponseDto>(bankAccount);
+
+                // Return a 201 Created response with the bank account
                 return CreatedAtAction(nameof(GetBankAccountById), new {id = bankAccount.Id}, bankAccountResponseDto);
             }
             catch(Exception ex)
             {
+                // Return a 500 Internal Server Error with the error message
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             };
         }
 
         [HttpPost]
         [Route("{id}/TransferMoney")]
-        public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToBankCardByNumber(Guid id, [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
+        public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToBankCardByNumber(
+            Guid id, 
+            [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
         {
             var senderBankCardNumber = bankTransactionDto.SenderBankCardNumber;
             var recipientBankCardNumber = bankTransactionDto.RecipientBankCardNumber;
+
+            // Validate the incomming request
             if (bankTransactionDto == null)
             {
                 return BadRequest("Bank transaction data is required");
             }
+
+            // Validate the recipient bank card number field
             if (string.IsNullOrEmpty(recipientBankCardNumber))
             {
                 return BadRequest("Recipient bank card number is required");
             }
+
+            // Validate the sender bank card number field
             if (string.IsNullOrEmpty(senderBankCardNumber))
             {
                 return BadRequest("Recipient bank card number is required");
             }
+
+            // Validate the amount field
             if (bankTransactionDto.Amount == 0)
             {
                 return BadRequest("Money amount is required");
             }
             try
             {
+                // Map the request DTO to a bank transaction entity
                 var bankTransaction = _mapper.Map<BankTransaction>(bankTransactionDto);
-                await _bankAccountsService.TransferMoneyToBankCardByNumberAsync(id, bankTransaction, senderBankCardNumber, recipientBankCardNumber);
+
+                // Transfer money service method
+                await _bankAccountsService.TransferMoneyToBankCardByNumberAsync(
+                    id, 
+                    bankTransaction, 
+                    senderBankCardNumber, 
+                    recipientBankCardNumber);
+
+                // Return a 404 Not Found response
                 return NotFound();
             }
             catch (ArgumentException ex)
             {
+                // Return a 404 Not Found response with the error message
                 return NotFound(ex.Message);
             }
             catch(Exception ex)
             {
+                // Return a 500 Internal Server Error with the error message
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             };
         }
@@ -135,25 +194,33 @@ namespace MinoBank.API.Controllers
         [Route("{id}/BankCards/Create")]
         public async Task<ActionResult<BankCardResponseDto>> CreateBankCard(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
         {
+            // Validate the bank card type field
             if (bankCardType == null)
             {
                 return BadRequest("Bank card type is required");
             }
+
+            // Validate the currency code field
             if (currencyCode == null)
             {
                 return BadRequest("Bank card type is required");
             }
             try
             {
+                // Create bank card service method
                 await _bankAccountsService.CreateBankCardByIdAsync(id, bankCardType, currencyCode);
+
+                // Return a 204 No Content response
                 return NoContent();
             }
             catch (ArgumentException ex)
             {
+                // Return a 404 Not Found response with the error message
                 return NotFound(ex.Message);
             }
             catch(Exception ex)
             {
+                // Return a 500 Internal Server Error with the error message
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             };
         }
@@ -164,40 +231,51 @@ namespace MinoBank.API.Controllers
         {
             try
             {
+                // Delete bank account service method
                 await _bankAccountsService.DeleteBankAccountByIdAsync(id);
+
+                // Return a 204 No Content response
                 return NoContent();
             }
             catch (ArgumentException ex)
             {
+                // Return a 404 Not Found response with the error message
                 return NotFound(ex.Message);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
+                // Return a 500 Internal Server Error with the error message
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            };
         }
 
         [HttpPut]
         [Route("{id}/UpdateStatus")]
         public async Task<ActionResult> UpdateBankAccountStatusById(Guid id, BankAccountStatus newStatus)
         {
+            // Validate the status field
             if (newStatus == null)
             {
                 return BadRequest("Status is required");
             }
             try
             {
+                // Update bank account status service method
                 await _bankAccountsService.UpdateBankAccountStatusByIdAsync(id, newStatus);
+
+                // Return a 204 No Content response
                 return NoContent();
             }
             catch (ArgumentException ex)
             {
+                // Return a 404 Not Found response with the error message
                 return NotFound(ex.Message);
             }
-            catch (Exception ex)
+            catch(Exception ex)
             {
+                // Return a 500 Internal Server Error with the error message
                 return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            };
         }
     }
 }

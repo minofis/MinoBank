@@ -51,12 +51,12 @@ namespace MinoBank.API.Controllers
         }
 
         [HttpDelete]
-        [Route("Delete/{bankCardId}")]
-        public async Task<ActionResult> DeleteBankAccountById(Guid bankCardId)
+        [Route("Delete/{id}")]
+        public async Task<ActionResult> DeleteBankAccountById(Guid id)
         {
             try
             {
-                await _bankCardsService.DeleteBankCardByIdAsync(bankCardId);
+                await _bankCardsService.DeleteBankCardByIdAsync(id);
                 return NoContent();
             }
             catch (ArgumentException ex)
