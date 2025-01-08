@@ -1,8 +1,8 @@
 using MinoBank.Core.Entities;
 
-namespace MinoBank.Core.Interfaces.Repositories
+namespace MinoBank.Core.Interfaces.Services
 {
-    public interface IUsersRepository
+    public interface IUsersService
     {
         Task<List<User>> GetAllUsersAsync();
         Task<User> GetUserByIdAsync(Guid userId);

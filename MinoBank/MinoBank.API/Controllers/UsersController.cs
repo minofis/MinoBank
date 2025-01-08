@@ -1,66 +1,112 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.UserDtos;
 using MinoBank.Core.Entities;
-using MinoBank.Core.Interfaces.Repositories;
+using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.API.Controllers
 {
     [ApiController]
-    [Route("MinoBank/[controller]")]
+    [Route("minobank/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly IUsersRepository _usersRepo;
-        public UsersController(IUsersRepository usersRepo)
+        private readonly IMapper _mapper;
+        private readonly IUsersService _usersService;
+        public UsersController(IUsersService usersService, IMapper mapper)
         {
-            _usersRepo = usersRepo;
+            _usersService = usersService;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
+        public async Task<ActionResult<List<UserResponseDto>>> GetAllUsers()
         {
-            return await _usersRepo.GetAllUsersAsync();
+            // Get all users
+            var users = await _usersService.GetAllUsersAsync();
+
+            // Map the user to a list of response DTOs
+            var userDtos = _mapper.Map<List<UserResponseDto>>(users);
+
+            // Return a 200 Ok response with the list of users
+            return Ok(userDtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUserById(Guid id)
+        public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
         {
-            var user = await _usersRepo.GetUserByIdAsync(id);
-            if(user == null){
-                return BadRequest();
+            try
+            {
+                // Get user by the specified ID
+                var user = await _usersService.GetUserByIdAsync(id);
+
+                // Map the user to response DTO
+                var userDto = _mapper.Map<UserResponseDto>(user);
+
+                // Return a 200 Ok response with the user
+                return Ok(userDto);
             }
-            return Ok(user);
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
         }
 
         [HttpPost]
-        [Route("Create")]
-        public async Task CreateUser([FromBody]UserCreateRequestDto userDto)
+        public async Task<ActionResult<UserResponseDto>> Create([FromBody]UserCreateRequestDto userDto)
         {
-            var user = new User{
-                Username = userDto.Username,
-                Email = userDto.Email,
-                Password = userDto.Password,
-                CreationDate = DateTime.Now
+            // Validate the incomming request
+            if (userDto == null)
+            {
+                return BadRequest("User data is required");
+            }
+            try
+            {
+                // Map the request DTO to a user entity
+                var user = _mapper.Map<User>(userDto);
+
+                // Create a new user
+                await _usersService.CreateUserAsync(user);
+
+                // Map the user entity to a response DTO
+                var userResponseDto = _mapper.Map<UserResponseDto>(user);
+
+                // Return a 201 Created response with the user
+                return CreatedAtAction(nameof(GetUser), new {id = user.Id}, userResponseDto);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             };
-            await _usersRepo.CreateUserAsync(user);
         }
 
-        [HttpDelete]
-        [Route("Delete/{id}")]
-        public async Task DeleteUserById(Guid id)
+        [HttpDelete("{id}")]
+        public async Task<ActionResult> Delete(Guid id)
         {
-            await _usersRepo.DeleteUserByIdAsync(id);
-        }
+            try
+            {
+                // Delete user service method
+                await _usersService.DeleteUserByIdAsync(id);
 
-        [HttpPut]
-        [Route("Update/{id}")]
-        public async Task UpdateUserById(Guid id, UserCreateRequestDto userDto)
-        {
-            var user = new User{
-                Username = userDto.Username,
-                Email = userDto.Email,
-                Password = userDto.Password
+                // Return a 200 Ok response
+                return Ok("User is deleted successfully");
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             };
-            await _usersRepo.UpdateUserByIdAsync(id, user);
         }
     }
 }
