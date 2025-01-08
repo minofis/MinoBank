@@ -12,7 +12,7 @@ namespace MinoBank.Core.Entities
         }
         public Guid BankCardId { get; set; }
         public BankCard BankCard { get; set; }
-        public BankCardCurrencyCode CurrencyCode { get; set; }
+        public CurrencyCode CurrencyCode { get; set; }
         public string Number { get; set; } = string.Empty;
         public string CvvCode { get; set; } = string.Empty;
         public string ExpiryDate { get; set; } = "10/29";

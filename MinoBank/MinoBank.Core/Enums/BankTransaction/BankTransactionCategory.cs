@@ -2,9 +2,10 @@ namespace MinoBank.Core.Enums.BankTransaction
 {
     public enum BankTransactionCategory
     {
-        Remittance,
+        FundsTransfer,
         Charity,
         Salary,
+        TopUp,
         MobileService
     }
 }

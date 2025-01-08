@@ -162,19 +162,8 @@ namespace MinoBank.Infrastructure.Migrations
                     b.Property<Guid>("RecipientBankCardId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RecipientBankCardNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("SenderBankCardId")
+                    b.Property<Guid?>("SenderBankCardId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("SenderBankCardNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -255,8 +244,7 @@ namespace MinoBank.Infrastructure.Migrations
                     b.HasOne("MinoBank.Core.Entities.BankCard", "SenderBankCard")
                         .WithMany("SentTransactions")
                         .HasForeignKey("SenderBankCardId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("RecipientBankCard");
 

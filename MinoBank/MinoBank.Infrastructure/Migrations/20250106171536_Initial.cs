@@ -67,10 +67,10 @@ namespace MinoBank.Infrastructure.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     Type = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    PinCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DailyLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     MonthlyLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     AnnualLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PinCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BankAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -118,12 +118,9 @@ namespace MinoBank.Infrastructure.Migrations
                     Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     CurrencyCode = table.Column<int>(type: "int", nullable: false),
                     Category = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SenderBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SenderBankCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RecipientBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    RecipientBankCardNumber = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    SenderBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    RecipientBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -139,7 +136,7 @@ namespace MinoBank.Infrastructure.Migrations
                         column: x => x.SenderBankCardId,
                         principalTable: "BankCards",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(

@@ -1,6 +1,6 @@
 namespace MinoBank.Core.Enums.BankCard
 {
-    public enum BankCardCurrencyCode
+    public enum CurrencyCode
     {
         EUR,
         USD
