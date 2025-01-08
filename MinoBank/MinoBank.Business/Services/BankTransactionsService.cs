@@ -19,7 +19,12 @@ namespace MinoBank.Business.Services
 
         public async Task<BankTransaction> GetBankTransactionByIdAsync(Guid bankTransactionId)
         {
-            return await _bankTransactionsRepo.GetBankTransactionByIdAsync(bankTransactionId);
+            // Get bank transaction by specificated ID
+            var bankTransaction = await _bankTransactionsRepo.GetBankTransactionByIdAsync(bankTransactionId)
+                ?? throw new ArgumentException($"Bank transaction with ID {bankTransactionId} not found.");
+
+            // Return bank transaction
+            return bankTransaction;
         }
 
         public async Task CreateBankTransactionAsync(BankTransaction newBankTransaction)

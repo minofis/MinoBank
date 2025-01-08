@@ -9,7 +9,6 @@ namespace MinoBank.API.Dtos.BankTransactionDtos
         public decimal Commission { get; set; }
         public string CurrencyCode { get; set; } = string.Empty;
         public string Category { get; set; } = string.Empty;
-        public string Type { get; set; } = string.Empty;
         public string CreationDate { get; set; } = string.Empty;
         public Guid SenderBankCardId { get; set; }
         public Guid RecipientBankCardId { get; set; }

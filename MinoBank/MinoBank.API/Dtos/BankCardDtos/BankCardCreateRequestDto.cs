@@ -6,8 +6,10 @@ namespace MinoBank.API.Dtos.BankCardDtos
     public class BankCardCreateRequestDto
     {
         [Required]
+        public Guid BankAccountId { get; set; }
+        [Required]
         public BankCardType Type { get; set; }
         [Required]
-        public BankCardCurrencyCode CurrencyCode { get; set; }
+        public CurrencyCode CurrencyCode { get; set; }
     }
 }

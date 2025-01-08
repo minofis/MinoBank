@@ -12,9 +12,6 @@ namespace MinoBank.API.Dtos.BankCardDtos
         public decimal MonthlyLimit { get; set; }
         public decimal AnnualLimit { get; set; }
         public string PinCode { get; set; } = "0000";
-        public List<BankTransactionResponseDto> SentTransactions { get; set; } = new List<BankTransactionResponseDto>();
-        public List<BankTransactionResponseDto> RecivedTransactions { get; set; } = new List<BankTransactionResponseDto>();
         public Guid BankAccountId { get; set; }
-        public BankCardDetailsResponseDto Details { get; set; }
     }
 }

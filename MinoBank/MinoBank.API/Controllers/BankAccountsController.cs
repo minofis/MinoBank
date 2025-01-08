@@ -2,10 +2,8 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.BankAccountDtos;
 using MinoBank.API.Dtos.BankCardDtos;
-using MinoBank.API.Dtos.BankTransactionDtos;
 using MinoBank.Core.Entities;
 using MinoBank.Core.Enums.BankAccount;
-using MinoBank.Core.Enums.BankCard;
 using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.API.Controllers
@@ -31,7 +29,7 @@ namespace MinoBank.API.Controllers
             // Map the bank accounts to a list of response DTOs
             var bankAccountResponseDtos = _mapper.Map<List<BankAccountResponseDto>>(bankAccounts);
 
-            // Return 200 status code with the list of bank accounts
+            // Return a 200 Ok response with the list of bank accounts
             return Ok(bankAccountResponseDtos);
         }
 
@@ -75,26 +73,6 @@ namespace MinoBank.API.Controllers
             return Ok(bankAccountDetailsResponseDto);
         }
 
-        [HttpGet]
-        [Route("{id}/bank-cards")]
-        public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCards(Guid id)
-        {
-            // Get all bank cards associated with the specified bank account ID
-            var bankCards = await _bankAccountsService.GetBankCardsByIdAsync(id);
-
-            // If the bank account does not exist, return a 404 Not Found response
-            if(bankCards == null)
-            {
-                return NotFound($"Bank account with ID {id} not found");
-            }
-
-            // Map the bank cards to a list of response DTOs
-            var bankCardsDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
-
-            // Return a 200 Ok response with the list of bank cards
-            return Ok(bankCardsDtos);
-        }
-
         [HttpPost]
         public async Task<ActionResult<BankAccountResponseDto>> Create([FromBody]BankAccountCreateRequestDto bankAccountDto)
         {
@@ -124,76 +102,28 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpPost]
-        [Route("{id}/transfer-money")]
-        public async Task<ActionResult<BankTransactionResponseDto>> TransferMoneyToCard(
-            Guid id, 
-            [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
+        [HttpGet]
+        [Route("{id}/bank-cards")]
+        public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCards(Guid id)
         {
-            var senderBankCardNumber = bankTransactionDto.SenderBankCardNumber;
-            var recipientBankCardNumber = bankTransactionDto.RecipientBankCardNumber;
+            // Get all bank cards associated with the specified bank account ID
+            var bankCards = await _bankAccountsService.GetBankCardsByIdAsync(id);
 
-            // Validate the incomming request
-            if (bankTransactionDto == null)
+            // If the bank account does not exist, return a 404 Not Found response
+            if(bankCards == null)
             {
-                return BadRequest("Bank transaction data is required");
+                return NotFound($"Bank account with ID {id} not found");
             }
-            try
-            {
-                // Map the request DTO to a bank transaction entity
-                var bankTransaction = _mapper.Map<BankTransaction>(bankTransactionDto);
 
-                // Transfer money service method
-                await _bankAccountsService.TransferMoneyToBankCardByNumberAsync(
-                    id, 
-                    bankTransaction, 
-                    senderBankCardNumber, 
-                    recipientBankCardNumber);
+            // Map the bank cards to a list of response DTOs
+            var bankCardsDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
 
-                // Map the bank transaction entity to a response DTO
-                var bankTransactionResponseDto = _mapper.Map<BankTransactionResponseDto>(bankTransaction);
-
-                // Return a 200 Ok response with the bank transaction
-                return Ok(bankTransactionResponseDto);
-            }
-            catch (ArgumentException ex)
-            {
-                // Return a 404 Not Found response with the error message
-                return NotFound(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                // Return a 500 Internal Server Error with the error message
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            };
-        }
-
-        [HttpPost]
-        [Route("{id}/bank-cards/create")]
-        public async Task<ActionResult<BankCardResponseDto>> CreateBankCardForAccount(Guid id, BankCardType bankCardType, BankCardCurrencyCode currencyCode)
-        {
-            try
-            {
-                // Create bank card service method
-                await _bankAccountsService.CreateBankCardByIdAsync(id, bankCardType, currencyCode);
-
-                // Return a 200 Ok response
-                return Ok("Bank card is created successfully");
-            }
-            catch (ArgumentException ex)
-            {
-                // Return a 404 Not Found response with the error message
-                return NotFound(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                // Return a 500 Internal Server Error with the error message
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            };
+            // Return a 200 Ok response with the list of bank cards
+            return Ok(bankCardsDtos);
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult> DeleteBankAccount(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             try
             {

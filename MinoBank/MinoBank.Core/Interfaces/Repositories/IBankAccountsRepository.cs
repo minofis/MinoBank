@@ -7,7 +7,6 @@ namespace MinoBank.Core.Interfaces.Repositories
     {
         Task<List<BankAccount>> GetAllBankAccountsAsync();
         Task<BankAccount> GetBankAccountByIdAsync(Guid bankAccountId);
-        Task<BankAccount> GetBankAccountByBankCardNumber(string bankCardNumber);
         Task CreateBankAccountAsync(BankAccount newBankAccount);
         Task DeleteBankAccountByIdAsync(Guid bankAccountId);
         Task UpdateBankAccountStatusByIdAsync(Guid bankAccountId, BankAccountStatus newStatus);

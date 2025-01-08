@@ -7,7 +7,5 @@ namespace MinoBank.API.Dtos.BankAccountDtos
         public Guid Id { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Type { get; set; } = string.Empty;
-        public List<BankCardResponseDto> BankCards { get; set; } = new List<BankCardResponseDto>();
-        public BankAccountDetailsResponseDto Details { get; set; }
     }
 }
