@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
+import { IBankAccount } from '../../models/bankAccount';
+import { BankAccountsService } from '../../services/bank-accounts.service';
 
 @Component({
   selector: 'app-bank-accounts-list',
@@ -6,5 +9,12 @@ import { Component } from '@angular/core';
   styleUrl: './bank-accounts-list.component.scss'
 })
 export class BankAccountsListComponent {
+  public bankAccounts$?: Observable<IBankAccount[]>;
 
+  constructor(private _bankAccountsService: BankAccountsService) {}
+
+  public ngOnInit(): void
+  {
+    this.bankAccounts$ = this._bankAccountsService.getBankAccounts();
+  }
 }

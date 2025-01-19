@@ -1,1 +1,9 @@
-<p>*bank accounts list*</p>
+<h1>Bank accounts:</h1>
+
+<div class="bank__accounts__list" *ngIf = "bankAccounts$ | async as bankAccounts">
+    <div class="bank__accounts__item" *ngFor = "let bankAccount of bankAccounts">
+        <div class="bank__account__item">{{bankAccount.id}}</div>
+        <div class="bank__account__item">{{bankAccount.type}}</div>
+        <div class="bank__account__item">{{bankAccount.status}}</div>
+    </div>
+</div>
