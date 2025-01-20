@@ -11,7 +11,7 @@ namespace MinoBank.Core.Entities
         public decimal Commission { get; set; } = 0;
         public CurrencyCode CurrencyCode { get; set; }
         public BankTransactionCategory Category { get; set; }
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.Now.ToUniversalTime();
 
         // Sender 
         public Guid? SenderBankCardId { get; set; }

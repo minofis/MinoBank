@@ -1,17 +1,18 @@
 version: '3.3'
 
 services:
-  mssql:
-    container_name: sql-server
-    image: mcr.microsoft.com/mssql/server:2022-latest
+  postgres:
+    container_name: postgres
+    image: postgres:latest
     restart: always
     environment:
-      ACCEPT_EULA: "Y"
-      SA_PASSWORD: "Aa1234567831#"
-    ports:
-      - 1433:1433
+      POSTGRES_DB: MinoBankDB
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 12345
     volumes:
-      - ../../data:/var/opt/mssql
+      - ../../data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
       
 volumes:
   my-volume:

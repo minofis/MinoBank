@@ -9,8 +9,9 @@ using MinoBank.Infrastructure.Data.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<MinoBankDbContext>(options =>{
-    options.UseSqlServer(builder.Configuration.GetConnectionString(nameof(MinoBankDbContext)));
+    options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(MinoBankDbContext)));
 });
+
 builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll",

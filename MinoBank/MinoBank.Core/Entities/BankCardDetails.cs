@@ -17,7 +17,7 @@ namespace MinoBank.Core.Entities
         public string CvvCode { get; set; } = string.Empty;
         public string ExpiryDate { get; set; } = "10/29";
         public string OwnerName { get; set; } = string.Empty;
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.Now.ToUniversalTime();
 
         private static string GenerateRandomCardNumber()
         {

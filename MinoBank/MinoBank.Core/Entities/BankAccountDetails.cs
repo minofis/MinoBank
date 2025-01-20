@@ -6,6 +6,6 @@ namespace MinoBank.Core.Entities
         public BankAccount BankAccount { get; set; }
         public string BankName { get; set; } = "MinoBank";
         public string OwnerName { get; set; } = string.Empty;        
-        public DateTime CreationDate { get; set; } = DateTime.Now;
+        public DateTime CreationDate { get; set; } = DateTime.Now.ToUniversalTime();
     }
 }

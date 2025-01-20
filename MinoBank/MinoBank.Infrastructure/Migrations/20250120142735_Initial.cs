@@ -15,9 +15,9 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "BankAccounts",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -28,11 +28,11 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "Users",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -43,10 +43,10 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "BankAccountDetails",
                 columns: table => new
                 {
-                    BankAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    BankAccountId = table.Column<Guid>(type: "uuid", nullable: false),
+                    BankName = table.Column<string>(type: "text", nullable: false),
+                    OwnerName = table.Column<string>(type: "text", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -63,15 +63,15 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "BankCards",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    PinCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DailyLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    MonthlyLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    AnnualLimit = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    BankAccountId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    Balance = table.Column<decimal>(type: "numeric", nullable: false),
+                    PinCode = table.Column<string>(type: "text", nullable: false),
+                    DailyLimit = table.Column<decimal>(type: "numeric", nullable: false),
+                    MonthlyLimit = table.Column<decimal>(type: "numeric", nullable: false),
+                    AnnualLimit = table.Column<decimal>(type: "numeric", nullable: false),
+                    BankAccountId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,13 +88,13 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "BankCardDetails",
                 columns: table => new
                 {
-                    BankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CurrencyCode = table.Column<int>(type: "int", nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CvvCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpiryDate = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    OwnerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    BankCardId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CurrencyCode = table.Column<int>(type: "integer", nullable: false),
+                    Number = table.Column<string>(type: "text", nullable: false),
+                    CvvCode = table.Column<string>(type: "text", nullable: false),
+                    ExpiryDate = table.Column<string>(type: "text", nullable: false),
+                    OwnerName = table.Column<string>(type: "text", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -111,16 +111,16 @@ namespace MinoBank.Infrastructure.Migrations
                 name: "BankTransactions",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Commission = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CurrencyCode = table.Column<int>(type: "int", nullable: false),
-                    Category = table.Column<int>(type: "int", nullable: false),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    SenderBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    RecipientBankCardId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Commission = table.Column<decimal>(type: "numeric", nullable: false),
+                    CurrencyCode = table.Column<int>(type: "integer", nullable: false),
+                    Category = table.Column<int>(type: "integer", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SenderBankCardId = table.Column<Guid>(type: "uuid", nullable: true),
+                    RecipientBankCardId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
