@@ -1,8 +1,8 @@
 version: '3.3'
 
 services:
-  postgres:
-    container_name: postgres
+  postgresDb:
+    container_name: MinoBankDB
     image: postgres:latest
     restart: always
     environment:
@@ -13,6 +13,19 @@ services:
       - ../../data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+
+  postgresIdentity:
+    container_name: IdentityDB
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: IdentityDB
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 12345
+    volumes:
+      - ../../identityData:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
       
 volumes:
-  my-volume:
+  data:

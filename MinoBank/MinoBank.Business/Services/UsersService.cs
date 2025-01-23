@@ -1,4 +1,5 @@
 using MinoBank.Core.Entities;
+using MinoBank.Core.Interfaces.Auth;
 using MinoBank.Core.Interfaces.Repositories;
 using MinoBank.Core.Interfaces.Services;
 
@@ -7,34 +8,20 @@ namespace MinoBank.Business.Services
     public class UsersService : IUsersService
     {
         private readonly IUsersRepository _usersRepo;
-        public UsersService(IUsersRepository usersRepo)
+        private readonly IPasswordHasher _passowordHasher;
+        public UsersService(IUsersRepository usersRepo, IPasswordHasher passowordHasher)
         {
             _usersRepo = usersRepo;
+            _passowordHasher = passowordHasher;
         }
 
-        public async Task<List<User>> GetAllUsersAsync()
+        public async Task Register(string firstName, string lastName, int age, string phoneNumber, string email, string password)
         {
-            return await _usersRepo.GetAllUsersAsync();
-        }
+            var hashedPassword = _passowordHasher.Generate(password); 
 
-        public async Task<User> GetUserByIdAsync(Guid userId)
-        {
-            // Get user by specificated ID
-            var user = await _usersRepo.GetUserByIdAsync(userId)
-                ?? throw new ArgumentException($"User with ID {userId} not found.");
+            var user = User.Create(Guid.NewGuid(), firstName, lastName, age, phoneNumber, email, hashedPassword);
 
-            // Return user
-            return user;
-        }
-
-        public async Task CreateUserAsync(User user)
-        {
-            await _usersRepo.CreateUserAsync(user);
-        }
-
-        public async Task DeleteUserByIdAsync(Guid userId)
-        {
-            await _usersRepo.DeleteUserByIdAsync(userId);
+            await _usersRepo.AddUserAsync(user);
         }
     }
 }

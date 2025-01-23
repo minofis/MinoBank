@@ -2,8 +2,9 @@ using MinoBank.Core.Enums.BankCard;
 
 namespace MinoBank.Core.Entities
 {
-    public class BankCard : BaseEntity
+    public class BankCard 
     {
+        public Guid Id { get; set; }
         public BankCardStatus Status { get; set; } = BankCardStatus.Active;
         public BankCardType Type { get; set; } = BankCardType.Standart;
         public decimal Balance { get; set; } = 0;

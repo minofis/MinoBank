@@ -3,8 +3,9 @@ using MinoBank.Core.Enums.BankTransaction;
 
 namespace MinoBank.Core.Entities
 {
-    public class BankTransaction : BaseEntity
+    public class BankTransaction
     {
+        public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public decimal Amount { get; set; } = 0;

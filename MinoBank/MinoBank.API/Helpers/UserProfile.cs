@@ -9,8 +9,6 @@ namespace MinoBank.API.Helpers
         public UserProfile()
         {
             CreateMap<User, UserResponseDto>();
-            
-            CreateMap<UserCreateRequestDto, User>();
         }
     }
 }

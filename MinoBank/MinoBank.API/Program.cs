@@ -1,15 +1,22 @@
 using Microsoft.EntityFrameworkCore;
 using MinoBank.API.Helpers;
 using MinoBank.Business.Services;
+using MinoBank.Core.Interfaces.Auth;
 using MinoBank.Core.Interfaces.Repositories;
 using MinoBank.Core.Interfaces.Services;
+using MinoBank.Infrastructure;
 using MinoBank.Infrastructure.Data;
+using MinoBank.Infrastructure.Identity.Repositories;
 using MinoBank.Infrastructure.Data.Repositories;
+using MinoBank.Infrastructure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<MinoBankDbContext>(options =>{
     options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(MinoBankDbContext)));
+});
+builder.Services.AddDbContext<UserIdentityDbContext>(options =>{
+    options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(UserIdentityDbContext)));
 });
 
 builder.Services.AddCors(options =>
@@ -30,6 +37,7 @@ builder.Services.AddScoped<IBankTransactionsRepository, BankTransactionsReposito
 builder.Services.AddScoped<IBankAccountsService, BankAccountsService>();
 builder.Services.AddScoped<IBankCardsService, BankCardsService>();
 builder.Services.AddScoped<IBankTransactionsService, BankTransactionsService>();
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddAutoMapper(typeof(BankAccountProfile));
 builder.Services.AddAutoMapper(typeof(BankCardProfile));
 builder.Services.AddAutoMapper(typeof(BankTransactionProfile));
