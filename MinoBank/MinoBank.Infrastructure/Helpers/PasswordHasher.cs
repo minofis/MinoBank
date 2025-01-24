@@ -1,6 +1,6 @@
 using MinoBank.Core.Interfaces.Auth;
 
-namespace MinoBank.Infrastructure
+namespace MinoBank.Infrastructure.Helpers
 {
     public class PasswordHasher : IPasswordHasher
     {

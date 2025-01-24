@@ -9,10 +9,29 @@ namespace MinoBank.Business.Services
     {
         private readonly IUsersRepository _usersRepo;
         private readonly IPasswordHasher _passowordHasher;
-        public UsersService(IUsersRepository usersRepo, IPasswordHasher passowordHasher)
+        private readonly IJwtProvider _jwtProvider;
+        public UsersService(IUsersRepository usersRepo, IPasswordHasher passowordHasher, IJwtProvider jwtProvider)
         {
             _usersRepo = usersRepo;
             _passowordHasher = passowordHasher;
+            _jwtProvider = jwtProvider;
+        }
+
+        public async Task<string> Login(string phoneNumber, string password)
+        {
+            var user =  await _usersRepo.GetUserByPhoneNumberAsync(phoneNumber) 
+                ?? throw new ArgumentException($"User with phone number {phoneNumber} not found.");
+
+            var result = _passowordHasher.Verify(user.PasswordHash, password);
+
+            if(result == false)
+            {
+                throw new Exception("Failed to login");
+            }
+
+            var token = _jwtProvider.GenerateToken(user);
+
+            return token;
         }
 
         public async Task Register(string firstName, string lastName, int age, string phoneNumber, string email, string password)

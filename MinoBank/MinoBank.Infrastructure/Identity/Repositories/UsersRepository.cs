@@ -15,11 +15,11 @@ namespace MinoBank.Infrastructure.Identity.Repositories
             _context = context;
             _mapper = mapper;
         }
-        public async Task<User> GetUserByEmailAsync(string email)
+        public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
         {
             var userEntity = await _context.Users
                 .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.Email == email);
+                .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
             
             return _mapper.Map<User>(userEntity);
         }

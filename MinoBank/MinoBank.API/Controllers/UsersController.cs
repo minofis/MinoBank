@@ -19,9 +19,31 @@ namespace MinoBank.API.Controllers
 
         [HttpPost]
         [Route("/login")]
-        public async Task<IActionResult> Login([FromBody]UserLoginRequestDto loginDto)
+        public async Task<ActionResult<string>> Login([FromBody]UserLoginRequestDto loginDto)
         {
-            return Ok();
+            // Validate the incomming request
+            if (loginDto == null)
+            {
+                return BadRequest("Login data is required");
+            }
+            try
+            {
+                // Login action
+                var token = await _usersService.Login(loginDto.PhoneNumber, loginDto.Password);
+
+                // Return a 200 Ok 
+                return Ok(token);
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
         }
 
         [HttpPost]
