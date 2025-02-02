@@ -9,14 +9,23 @@ namespace MinoBank.Business.Services
     public class BankAccountsService : IBankAccountsService
     {
         private readonly IBankAccountsRepository _bankAccountsRepo;
-        public BankAccountsService(IBankAccountsRepository bankAccountsRepo, IBankCardsRepository bankCardsRepo)
+        private readonly IUsersRepository _usersRepo;
+        public BankAccountsService(IBankAccountsRepository bankAccountsRepo, IUsersRepository usersRepo)
         {
             _bankAccountsRepo = bankAccountsRepo;
+            _usersRepo = usersRepo;
         }
 
         public async Task<List<BankAccount>> GetAllBankAccountsAsync()
         {
             return await _bankAccountsRepo.GetAllBankAccountsAsync();
+        }
+
+        public async Task<List<BankAccount>> GetBankAccountsByUserAsync(Guid userId)
+        {
+            var bankAccounts = await _bankAccountsRepo.GetBankAccountsByUserIdAsync(userId)
+                ?? throw new ArgumentException("This user doesn't have any bank accounts");
+            return bankAccounts;
         }
 
         public async Task<BankAccount> GetBankAccountByIdAsync(Guid bankAccountId)
@@ -55,8 +64,25 @@ namespace MinoBank.Business.Services
             return bankAccountCards;
         }
 
-        public async Task CreateBankAccountAsync(BankAccount bankAccount)
+        public async Task CreateBankAccountAsync(Guid userId, BankAccountType type)
         {
+            // Get user by id
+            var user = await _usersRepo.GetUserByIdAsync(userId)
+                ?? throw new ArgumentException($"User with ID {userId} not found.");
+
+            // Get bank accounts by user
+            var bankAccounts = await _bankAccountsRepo.GetBankAccountsByUserIdAsync(userId);
+
+            // Check if bank account with this type already exist
+            if (bankAccounts != null && bankAccounts.Any(a => a.Type == type))
+            {
+                throw new ArgumentException($"Bank account with type {type} already exists");
+            }
+
+            // Create a bank account
+            var bankAccount = BankAccount.Create(user, type);
+
+            // Add the bank account
             await _bankAccountsRepo.CreateBankAccountAsync(bankAccount);
         }
 

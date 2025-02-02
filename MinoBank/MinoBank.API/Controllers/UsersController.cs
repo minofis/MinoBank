@@ -1,4 +1,3 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.UserDtos;
 using MinoBank.Core.Interfaces.Services;
@@ -9,16 +8,13 @@ namespace MinoBank.API.Controllers
     [Route("minobank/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly IMapper _mapper;
         private readonly IUsersService _usersService;
-        public UsersController(IUsersService usersService, IMapper mapper)
+        public UsersController(IUsersService usersService)
         {
             _usersService = usersService;
-            _mapper = mapper;
         }
 
-        [HttpPost]
-        [Route("/login")]
+        [HttpPost("login")]
         public async Task<ActionResult<string>> Login([FromBody]UserLoginRequestDto loginDto)
         {
             // Validate the incomming request
@@ -31,7 +27,7 @@ namespace MinoBank.API.Controllers
                 // Login action
                 var token = await _usersService.Login(loginDto.PhoneNumber, loginDto.Password);
 
-                // Return a 200 Ok 
+                // Return a 200 OK
                 return Ok(token);
             }
             catch (ArgumentException ex)
@@ -46,8 +42,7 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpPost]
-        [Route("/register")]
+        [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]UserRegisterRequestDto registerDto)
         {
             // Validate the incomming request
@@ -58,10 +53,23 @@ namespace MinoBank.API.Controllers
             try
             {
                 // Register a new user
-                await _usersService.Register(registerDto.FirstName, registerDto.LastName, registerDto.Age, registerDto.PhoneNumber, registerDto.Email, registerDto.Password);
+                await _usersService.Register
+                (
+                    registerDto.FirstName,
+                    registerDto.LastName,
+                    registerDto.Age,
+                    registerDto.PhoneNumber,
+                    registerDto.Email, 
+                    registerDto.Password
+                );
 
-                // Return a 200 Ok 
-                return Ok("User registered successfully");
+                // Return a 201 Created 
+                return Created();
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 400 Bad Request response with the error message
+                return BadRequest(ex.Message);
             }
             catch(Exception ex)
             {

@@ -9,11 +9,13 @@ namespace MinoBank.Business.Services
     public class BankCardsService : IBankCardsService
     {
         private readonly IBankCardsRepository _bankCardsRepo;
+        private readonly IBankAccountsRepository _bankAccountsRepo;
         private readonly IBankTransactionsRepository _bankTransactionsRepo;
-        public BankCardsService(IBankCardsRepository bankCardsRepo, IBankTransactionsRepository bankTransactionsRepo)
+        public BankCardsService(IBankCardsRepository bankCardsRepo, IBankAccountsRepository bankAccountsRepo, IBankTransactionsRepository bankTransactionsRepo)
         {
             _bankCardsRepo = bankCardsRepo;
             _bankTransactionsRepo = bankTransactionsRepo;
+            _bankAccountsRepo = bankAccountsRepo;
         }
         
         public async Task<List<BankCard>> GetAllBankCardsAsync()
@@ -80,7 +82,7 @@ namespace MinoBank.Business.Services
                 ?? throw new ArgumentException($"Bank card with ID {bankCardId} not found.");
 
             // Update balance
-            recipientBankCard.Balance += topUpAmount;
+            recipientBankCard.IncreaseBalance(topUpAmount);
 
             // Create bank transaction
             var bankTransaction = new BankTransaction
@@ -115,8 +117,8 @@ namespace MinoBank.Business.Services
                 throw new ArgumentException($"You do not have enough money for this transaction.");
 
             // Update balances
-            senderBankCard.Balance -= newBankTransaction.Amount;
-            recipientBankCard.Balance += newBankTransaction.Amount;
+            senderBankCard.ReduceBalance(newBankTransaction.Amount);
+            recipientBankCard.IncreaseBalance(newBankTransaction.Amount);
 
             // Create the transaction
             var bankTransaction = new BankTransaction
@@ -139,19 +141,25 @@ namespace MinoBank.Business.Services
             await _bankCardsRepo.SaveChangesAsync();
         }
 
-        public async Task CreateBankCardAsync(BankCard newBankCard)
+        public async Task CreateBankCardAsync(Guid userId, Guid bankAccountId, BankCardType type, CurrencyCode currencyCode)
         {
-            await _bankCardsRepo.CreateBankCardAsync(newBankCard);
+            // Get bank account by id
+            var bankAccount = await _bankAccountsRepo.GetBankAccountByIdAsync(bankAccountId)
+                ?? throw new ArgumentException($"Bank account with ID {bankAccountId} not found.");
+
+            if (bankAccount.UserId != userId)
+            {
+                throw new ArgumentException($"Access to bank account with ID {bankAccountId} is forbidden.");
+            }
+
+            var bankCard = BankCard.Create(Guid.NewGuid(), BankCardStatus.Active, type, bankAccountId, currencyCode, bankAccount.Details.OwnerName);
+            
+            await _bankCardsRepo.CreateBankCardAsync(bankCard);
         }
 
         public async Task DeleteBankCardByIdAsync(Guid bankCardId)
         {
             await _bankCardsRepo.DeleteBankCardByIdAsync(bankCardId);
-        }
-
-        public async Task UpdateBankCardDailyLimitByIdAsync(Guid bankCardId, decimal newDailyLimit)
-        {
-            await _bankCardsRepo.UpdateBankCardDailyLimitByIdAsync(bankCardId, newDailyLimit);
         }
 
         public async Task UpdateBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode)

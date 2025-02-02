@@ -12,6 +12,7 @@ using MinoBank.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,7 @@ builder.Services.AddDbContext<MinoBankDbContext>(options =>{
 builder.Services.AddDbContext<UserIdentityDbContext>(options =>{
     options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(UserIdentityDbContext)));
 });
+
 
 builder.Services.AddCors(options =>
     {
@@ -47,7 +49,15 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.SecretKey))
         };
     });
-builder.Services.AddAuthorization();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("BankAccountOwnerPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireClaim("userId");
+    });
+});
 
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
@@ -63,8 +73,38 @@ builder.Services.AddAutoMapper(typeof(BankAccountProfile));
 builder.Services.AddAutoMapper(typeof(BankCardProfile));
 builder.Services.AddAutoMapper(typeof(BankTransactionProfile));
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection(nameof(JwtConfiguration)));
-builder.Services.AddSwaggerGen();
+
 builder.Services.AddControllers();
+builder.Services.AddSwaggerGen(options =>
+{
+    // Add Bearer token security definition
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' [space] and your token in the text input below.\nExample: \"Bearer abc123xyz\""
+    });
+
+    // Add global security requirement
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())

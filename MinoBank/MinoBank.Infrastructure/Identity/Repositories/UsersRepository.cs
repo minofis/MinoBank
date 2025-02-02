@@ -2,39 +2,40 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using MinoBank.Core.Entities;
 using MinoBank.Core.Interfaces.Repositories;
-using MinoBank.Infrastructure.Identity.Entities;
 
 namespace MinoBank.Infrastructure.Identity.Repositories
 {
     public class UsersRepository : IUsersRepository
     {
         private readonly UserIdentityDbContext _context;
-        private readonly IMapper _mapper;
-        public UsersRepository(UserIdentityDbContext context, IMapper mapper)
+        public UsersRepository(UserIdentityDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
-        public async Task<User> GetUserByPhoneNumberAsync(string phoneNumber)
+        public async Task<UserEntity> GetUserByPhoneNumberAsync(string phoneNumber)
         {
-            var userEntity = await _context.Users
+            return await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.PhoneNumber == phoneNumber);
-            
-            return _mapper.Map<User>(userEntity);
         }
-        public async Task AddUserAsync(User user)
+
+        public async Task<UserEntity> GetUserByEmailAsync(string email)
         {
-            var userEntity = new UserEntity(){
-                Id = user.Id,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Age = user.Age,
-                PasswordHash = user.PasswordHash,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email
-            };
-            await _context.Users.AddAsync(userEntity);
+            return await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        public async Task<UserEntity> GetUserByIdAsync(Guid id)
+        {
+            return await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == id);
+        }
+        
+        public async Task AddUserAsync(UserEntity user)
+        {
+            await _context.Users.AddAsync(user);
             await _context.SaveChangesAsync();
         }
     }

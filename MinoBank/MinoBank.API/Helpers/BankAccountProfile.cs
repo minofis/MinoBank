@@ -15,13 +15,6 @@ namespace MinoBank.API.Helpers
             
             CreateMap<BankAccountDetails, BankAccountDetailsResponseDto>()
                 .ForMember(d => d.CreationDate, o => o.MapFrom(s => s.CreationDate.ToString()));
-
-            CreateMap<BankAccountCreateRequestDto, BankAccount>()
-                .ForMember(d => d.Type, o => o.MapFrom(s => s.Type))
-                .ForMember(d => d.Details, o => o.MapFrom(s => new BankAccountDetails
-                {
-                    OwnerName = s.OwnerName
-                }));
         }
     }
 }

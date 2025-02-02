@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -14,13 +15,19 @@ namespace MinoBank.Infrastructure.Helpers
         {
             _configuration = configuration.Value;
         }
-        public string GenerateToken(User user)
+        public string GenerateToken(UserEntity user)
         {
+            var claims = new []
+            {
+                new Claim("userId", user.Id.ToString())
+            };
+
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.SecretKey));
 
             var signingCredentials = new SigningCredentials(secretKey, SecurityAlgorithms.HmacSha256);
 
             var token = new JwtSecurityToken(
+                claims: claims,
                 signingCredentials: signingCredentials,
                 expires: DateTime.UtcNow.AddHours(_configuration.ExpiresHours)
             );

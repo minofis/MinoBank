@@ -5,7 +5,9 @@ namespace MinoBank.Core.Interfaces.Repositories
     public interface IUsersRepository
     {
 
-        Task<User> GetUserByPhoneNumberAsync(string phoneNumber);
-        Task AddUserAsync(User user);
+        Task<UserEntity> GetUserByPhoneNumberAsync(string phoneNumber);
+        Task<UserEntity> GetUserByEmailAsync(string email);
+        Task<UserEntity> GetUserByIdAsync(Guid id);
+        Task AddUserAsync(UserEntity user);
     }
 }

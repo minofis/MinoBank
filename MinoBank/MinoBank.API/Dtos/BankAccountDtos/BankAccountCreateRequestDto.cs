@@ -7,7 +7,5 @@ namespace MinoBank.API.Dtos.BankAccountDtos
     {
         [Required]
         public BankAccountType Type { get; set; }
-        [Required]
-        public string OwnerName { get; set; } = string.Empty;
     }
 }

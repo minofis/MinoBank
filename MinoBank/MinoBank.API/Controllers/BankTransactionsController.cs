@@ -5,6 +5,7 @@ using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.API.Controllers
 {
+/*
     [ApiController]
     [Route("minobank/[controller]")]
     public class BankTransactionsController : ControllerBase
@@ -55,28 +56,6 @@ namespace MinoBank.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             };
         }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(Guid id)
-        {
-            try
-            {
-                // Delete bank transaction service method
-                await _bankTransactionsService.DeleteBankTransactionByIdAsync(id);
-
-                // Return a 200 Ok response
-                return Ok("Bank transaction is deleted successfully");
-            }
-            catch (ArgumentException ex)
-            {
-                // Return a 404 Not Found response with the error message
-                return NotFound(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                // Return a 500 Internal Server Error with the error message
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            };
-        }
     }
+*/
 }

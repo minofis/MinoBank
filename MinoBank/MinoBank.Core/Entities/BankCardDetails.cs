@@ -5,19 +5,30 @@ namespace MinoBank.Core.Entities
 {
     public class BankCardDetails
     {
-        public BankCardDetails()
+        public BankCardDetails(){}
+        public BankCardDetails(Guid id, CurrencyCode currencyCode, string ownerName, DateTime creationDate, string number, string cvvCode, string expiryDate)
         {
-            Number = GenerateRandomCardNumber();
-            CvvCode = GenerateRandomCvvCode();
+            BankCardId = id;
+            CurrencyCode = currencyCode;
+            Number = number;
+            CvvCode = cvvCode;
+            ExpiryDate = expiryDate;
+            OwnerName = ownerName;
+            CreationDate = creationDate;
         }
         public Guid BankCardId { get; set; }
         public BankCard BankCard { get; set; }
-        public CurrencyCode CurrencyCode { get; set; }
-        public string Number { get; set; } = string.Empty;
-        public string CvvCode { get; set; } = string.Empty;
-        public string ExpiryDate { get; set; } = "10/29";
-        public string OwnerName { get; set; } = string.Empty;
-        public DateTime CreationDate { get; set; } = DateTime.Now.ToUniversalTime();
+        public CurrencyCode CurrencyCode { get; private set; }
+        public string Number { get; private set; }
+        public string CvvCode { get; private set; }
+        public string ExpiryDate { get; private set; } 
+        public string OwnerName { get; private set; }
+        public DateTime CreationDate { get; private set; }
+
+        public static BankCardDetails Create(Guid id, CurrencyCode currencyCode, string ownerName, DateTime creationDate)
+        {
+            return new BankCardDetails(id, currencyCode, ownerName, creationDate, GenerateRandomCardNumber(), GenerateRandomCvvCode(), "10/29");
+        }
 
         private static string GenerateRandomCardNumber()
         {

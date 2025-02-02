@@ -12,10 +12,9 @@ namespace MinoBank.Core.Interfaces.Services
         Task<List<BankTransaction>> GetRecivedTransactionsByIdAsync(Guid bankCardId);
         Task TopUpBankCardByIdAsync(Guid bankCardId, decimal topUpAmount);
         Task FundsTransferToBankCardByIdAsync(Guid bankCardId, BankTransaction newBankTransaction);
-        Task CreateBankCardAsync(BankCard bankCard);
+        Task CreateBankCardAsync(Guid userId, Guid bankAccountId, BankCardType type, CurrencyCode currencyCode);
         Task DeleteBankCardByIdAsync(Guid bankCardId);
         Task UpdateBankCardStatusByIdAsync(Guid bankCardId, BankCardStatus newStatus);
-        Task UpdateBankCardDailyLimitByIdAsync(Guid bankCardId, decimal newDailyLimit);
         Task UpdateBankCardPinCodeByIdAsync(Guid bankCardId, string newPinCode);
     }
 }

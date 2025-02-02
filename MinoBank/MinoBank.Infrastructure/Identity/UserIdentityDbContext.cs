@@ -1,18 +1,12 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MinoBank.Infrastructure.Identity.Entities;
+using MinoBank.Core.Entities;
 
 namespace MinoBank.Infrastructure.Identity
 {
-    public class UserIdentityDbContext : IdentityDbContext<UserEntity>
+    public class UserIdentityDbContext : DbContext
     {
-        public UserIdentityDbContext(DbContextOptions<UserIdentityDbContext> options) : base(options){}
-
+        public DbSet<RoleEntity> Roles { get; set; }
         public DbSet<UserEntity> Users { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-        }
+        public UserIdentityDbContext(DbContextOptions<UserIdentityDbContext> options) : base(options){}
     }
 }

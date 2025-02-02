@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.BankCardDtos;
 using MinoBank.API.Dtos.BankTransactionDtos;
@@ -18,27 +19,28 @@ namespace MinoBank.API.Controllers
             _bankCardsService = bankCardsService;
             _mapper = mapper;
         }
-
-        [HttpGet]
-        public async Task<ActionResult<List<BankCardResponseDto>>> GetAllBankCards()
-        {
-            // Get all bank cards
-            var bankCards = await _bankCardsService.GetAllBankCardsAsync();
-
-            // Map the bank cards to a list of response DTOs
-            var bankCardsResponseDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
-
-            // Return a 200 Ok response with the list of bank cards
-            return Ok(bankCardsResponseDtos);
-        }
-
+        
+        [Authorize(Policy = "BankAccountOwnerPolicy")]
         [HttpGet("{id}")]
         public async Task<ActionResult<BankCardResponseDto>> GetBankCard(Guid id)
         {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
             try
             {
                 // Get bank card by the specified ID
                 var bankCard = await _bankCardsService.GetBankCardByIdAsync(id);
+
+                if (bankCard.BankAccount.UserId != userId)
+                {
+                    return Forbid("Bearer");
+                }
 
                 // Map the bank card to response DTO
                 var bankCardDto = _mapper.Map<BankCardResponseDto>(bankCard);
@@ -58,14 +60,28 @@ namespace MinoBank.API.Controllers
             };
         }
 
+        [Authorize(Policy = "BankAccountOwnerPolicy")]
         [HttpGet]
         [Route("{id}/details")]
         public async Task<ActionResult<BankCardDetailsResponseDto>> GetBankCardDetailsById(Guid id)
         {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
             try
             {
                 // Get bank card details by the specified ID
                 var bankCardDetails = await _bankCardsService.GetBankCardDetailsByIdAsync(id);
+
+                if (bankCardDetails.BankCard.BankAccount.UserId != userId)
+                {
+                    return Forbid("Bearer");
+                }
 
                 // Map the bank card details to response DTO
                 var bankCardDetailsResponseDto = _mapper.Map<BankCardDetailsResponseDto>(bankCardDetails);
@@ -85,12 +101,65 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpGet]
-        [Route("{id}/sent-transactions")]
-        public async Task<ActionResult<List<BankTransaction>>> GetSentTransactions(Guid id)
+        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [HttpPost]
+        public async Task<ActionResult<BankCardResponseDto>> Create(BankCardCreateRequestDto bankCardDto)
         {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
             try
             {
+                // Create a new bank card
+                await _bankCardsService.CreateBankCardAsync
+                (
+                    userId,
+                    bankCardDto.BankAccountId, 
+                    bankCardDto.Type, 
+                    bankCardDto.CurrencyCode
+                );
+
+                // Return a 201 Created response
+                return Created();
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
+        }
+
+        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [HttpGet("{id}/sent-transactions")]
+        public async Task<ActionResult<List<BankTransaction>>> GetSentTransactions(Guid id)
+        {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
+            try
+            {
+                // Get bank card by the specified ID
+                var bankCard = await _bankCardsService.GetBankCardByIdAsync(id);
+
+                if (bankCard.BankAccount.UserId != userId)
+                {
+                    return Forbid("Bearer");
+                }
                 // Get sent transactions associated with the specified bank card ID
                 var sentTransactions = await _bankCardsService.GetSentTransactionsByIdAsync(id);
 
@@ -112,12 +181,27 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpGet]
-        [Route("{id}/recived-transactions")]
+        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [HttpGet("{id}/recived-transactions")]
         public async Task<ActionResult<List<BankTransaction>>> GetRecivedTransactions(Guid id)
         {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
             try
             {
+                // Get bank card by the specified ID
+                var bankCard = await _bankCardsService.GetBankCardByIdAsync(id);
+
+                if (bankCard.BankAccount.UserId != userId)
+                {
+                    return Forbid("Bearer");
+                }
                 // Get recived transactions associated with the specified bank card ID
                 var recivedTransactions = await _bankCardsService.GetRecivedTransactionsByIdAsync(id);
 
@@ -139,10 +223,18 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpPost]
-        [Route("{id}/top-up")]
+        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [HttpPost("{id}/top-up")]
         public async Task<ActionResult> TopUpCard(Guid id, [FromQuery] decimal topUpAmount)
         {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
             // Validate the top up amount value
             if (topUpAmount <= 0)
             {
@@ -150,6 +242,13 @@ namespace MinoBank.API.Controllers
             }
             try
             {
+                // Get bank card by the specified ID
+                var bankCard = await _bankCardsService.GetBankCardByIdAsync(id);
+
+                if (bankCard.BankAccount.UserId != userId)
+                {
+                    return Forbid("Bearer");
+                }
                 // Top-up card service method
                 await _bankCardsService.TopUpBankCardByIdAsync(id, topUpAmount);
 
@@ -174,6 +273,14 @@ namespace MinoBank.API.Controllers
             Guid id,
             [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
         {
+            // Get user id from the jwt token
+            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+
+            // Check user id
+            if (userId == null)
+            {
+                return Unauthorized("User isn't authenticated");
+            }
             // Validate the incomming request
             if (bankTransactionDto == null)
             {
@@ -181,6 +288,13 @@ namespace MinoBank.API.Controllers
             }
             try
             {
+                // Get bank card by the specified ID
+                var bankCard = await _bankCardsService.GetBankCardByIdAsync(id);
+
+                if (bankCard.BankAccount.UserId != userId)
+                {
+                    return Forbid("Bearer");
+                }
                 // Map the request DTO to a bank transaction entity
                 var bankTransaction = _mapper.Map<BankTransaction>(bankTransactionDto);
 
@@ -202,56 +316,17 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [HttpPost]
-        public async Task<ActionResult<BankCardResponseDto>> Create(BankCardCreateRequestDto bankCardDto)
+        [HttpGet]
+        public async Task<ActionResult<List<BankCardResponseDto>>> GetAllBankCards()
         {
-            try
-            {
-                // Map the request DTO to a bank card entity
-                var bankCard = _mapper.Map<BankCard>(bankCardDto);
+            // Get all bank cards
+            var bankCards = await _bankCardsService.GetAllBankCardsAsync();
 
-                // Create a new bank card
-                await _bankCardsService.CreateBankCardAsync(bankCard);
+            // Map the bank cards to a list of response DTOs
+            var bankCardsResponseDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
 
-                // Map the bank card entity to response DTO
-                var bankCardResponseDto = _mapper.Map<BankCardResponseDto>(bankCard);
-
-                // Return a 201 Created response with the bank card
-                return CreatedAtAction(nameof(GetBankCard), new {id = bankCard.Id}, bankCardResponseDto);
-            }
-            catch (ArgumentException ex)
-            {
-                // Return a 404 Not Found response with the error message
-                return NotFound(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                // Return a 500 Internal Server Error with the error message
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            };
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(Guid id)
-        {
-            try
-            {
-                // Delete bank card service method
-                await _bankCardsService.DeleteBankCardByIdAsync(id);
-
-                // Return a 200 Ok response
-                return Ok("Bank card is deleted successfully");
-            }
-            catch (ArgumentException ex)
-            {
-                // Return a 404 Not Found response with the error message
-                return NotFound(ex.Message);
-            }
-            catch(Exception ex)
-            {
-                // Return a 500 Internal Server Error with the error message
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            };
+            // Return a 200 Ok response with the list of bank cards
+            return Ok(bankCardsResponseDtos);
         }
     }
 }
