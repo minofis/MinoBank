@@ -34,9 +34,26 @@ namespace MinoBank.Infrastructure.Identity.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<Guid?>("UserEntityId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("UserEntityId");
+
                     b.ToTable("Roles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "ADMIN"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "CUSTOMER"
+                        });
                 });
 
             modelBuilder.Entity("MinoBank.Core.Entities.UserEntity", b =>
@@ -75,6 +92,18 @@ namespace MinoBank.Infrastructure.Identity.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("MinoBank.Core.Entities.RoleEntity", b =>
+                {
+                    b.HasOne("MinoBank.Core.Entities.UserEntity", null)
+                        .WithMany("Roles")
+                        .HasForeignKey("UserEntityId");
+                });
+
+            modelBuilder.Entity("MinoBank.Core.Entities.UserEntity", b =>
+                {
+                    b.Navigation("Roles");
                 });
 #pragma warning restore 612, 618
         }

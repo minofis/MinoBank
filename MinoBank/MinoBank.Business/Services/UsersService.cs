@@ -8,13 +8,15 @@ namespace MinoBank.Business.Services
     public class UsersService : IUsersService
     {
         private readonly IUsersRepository _usersRepo;
+        private readonly IRolesRepository _rolesRepo;
         private readonly IPasswordHasher _passowordHasher;
         private readonly IJwtProvider _jwtProvider;
-        public UsersService(IUsersRepository usersRepo, IPasswordHasher passowordHasher, IJwtProvider jwtProvider)
+        public UsersService(IUsersRepository usersRepo, IPasswordHasher passowordHasher, IJwtProvider jwtProvider, IRolesRepository rolesRepo)
         {
             _usersRepo = usersRepo;
             _passowordHasher = passowordHasher;
             _jwtProvider = jwtProvider;
+            _rolesRepo = rolesRepo;
         }
 
         public async Task<string> Login(string phoneNumber, string password)
@@ -56,6 +58,25 @@ namespace MinoBank.Business.Services
             var user = UserEntity.Create(Guid.NewGuid(), firstName, lastName, age, phoneNumber, email, hashedPassword);
 
             await _usersRepo.AddUserAsync(user);
+        }
+
+        public async Task<UserEntity> GetUserByIdAsync(Guid userId)
+        {
+            return await _usersRepo.GetUserByIdAsync(userId)
+                ?? throw new ArgumentException($"User with ID {userId} not found.");;
+        }
+
+        public async Task AddRoleToUserAsync(Guid userId, string roleName)
+        {
+            var role = await _rolesRepo.GetRoleByNameAsync(roleName)
+                ?? throw new ArgumentException($"Role with name {roleName} not found.");
+
+            await _usersRepo.AddRoleToUserAsync(userId, role);
+        }
+
+        public async Task RemoveRoleFromUserAsync(Guid userId, string roleName)
+        {
+            await _usersRepo.RemoveRoleFromUserAsync(userId, roleName);
         }
     }
 }

@@ -8,7 +8,8 @@ namespace MinoBank.API.Helpers
     {
         public UserProfile()
         {
-            CreateMap<UserEntity, UserResponseDto>();
+            CreateMap<UserEntity, UserResponseDto>()
+                .ForMember(t => t.Roles, o => o.MapFrom(s => s.Roles));
         }
     }
 }

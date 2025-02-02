@@ -29,6 +29,7 @@ namespace MinoBank.Infrastructure.Identity.Repositories
         public async Task<UserEntity> GetUserByIdAsync(Guid id)
         {
             return await _context.Users
+                .Include(u => u.Roles)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == id);
         }
@@ -36,6 +37,26 @@ namespace MinoBank.Infrastructure.Identity.Repositories
         public async Task AddUserAsync(UserEntity user)
         {
             await _context.Users.AddAsync(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AddRoleToUserAsync(Guid userId, RoleEntity role)
+        {
+            var user = await _context.Users
+                .Include(u => u.Roles)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            user.AddRole(role);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveRoleFromUserAsync(Guid userId, string roleName)
+        {
+            var user = await _context.Users
+                .Include(u => u.Roles)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            user.RemoveRole(roleName);
             await _context.SaveChangesAsync();
         }
     }

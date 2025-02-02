@@ -9,5 +9,7 @@ namespace MinoBank.Core.Interfaces.Repositories
         Task<UserEntity> GetUserByEmailAsync(string email);
         Task<UserEntity> GetUserByIdAsync(Guid id);
         Task AddUserAsync(UserEntity user);
+        Task AddRoleToUserAsync(Guid userId, RoleEntity role);
+        Task RemoveRoleFromUserAsync(Guid userId, string roleName);
     }
 }

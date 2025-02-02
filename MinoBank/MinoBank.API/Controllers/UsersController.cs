@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.UserDtos;
 using MinoBank.Core.Interfaces.Services;
@@ -9,9 +10,11 @@ namespace MinoBank.API.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUsersService _usersService;
-        public UsersController(IUsersService usersService)
+        private readonly IMapper _mapper;
+        public UsersController(IUsersService usersService, IMapper mapper)
         {
             _usersService = usersService;
+            _mapper = mapper;
         }
 
         [HttpPost("login")]
@@ -70,6 +73,74 @@ namespace MinoBank.API.Controllers
             {
                 // Return a 400 Bad Request response with the error message
                 return BadRequest(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
+        {
+            try
+            {
+                // Get user by specified ID
+                var user = await _usersService.GetUserByIdAsync(id);
+
+                // Map user to user response DTO
+                var userDto = _mapper.Map<UserResponseDto>(user);
+
+                // Return a 200 Ok response with user DTO
+                return Ok(userDto);
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
+        }
+
+        [HttpPost("{id}/add-role")]
+        public async Task<IActionResult> AddRoleToUser([FromQuery]string roleName, Guid id)
+        {
+            try
+            {
+                await _usersService.AddRoleToUserAsync(id, roleName);
+
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
+            }
+            catch(Exception ex)
+            {
+                // Return a 500 Internal Server Error with the error message
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            };
+        }
+
+        [HttpPost("{id}/remove-role")]
+        public async Task<IActionResult> RemoveRoleFromUser([FromQuery]string roleName, Guid id)
+        {
+            try
+            {
+                await _usersService.RemoveRoleFromUserAsync(id, roleName);
+
+                return Ok();
+            }
+            catch (ArgumentException ex)
+            {
+                // Return a 404 Not Found response with the error message
+                return NotFound(ex.Message);
             }
             catch(Exception ex)
             {
