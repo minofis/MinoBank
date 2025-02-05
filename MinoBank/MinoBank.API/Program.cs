@@ -6,13 +6,14 @@ using MinoBank.Core.Interfaces.Repositories;
 using MinoBank.Core.Interfaces.Services;
 using MinoBank.Infrastructure.Helpers;
 using MinoBank.Infrastructure.Data;
-using MinoBank.Infrastructure.Identity.Repositories;
 using MinoBank.Infrastructure.Data.Repositories;
 using MinoBank.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using MinoBank.Core.Entities.Identity;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,9 @@ builder.Services.AddDbContext<UserIdentityDbContext>(options =>{
     options.UseNpgsql(builder.Configuration.GetConnectionString(nameof(UserIdentityDbContext)));
 });
 
+builder.Services.AddIdentity<UserEntity, RoleEntity>()
+    .AddEntityFrameworkStores<UserIdentityDbContext>()
+    .AddDefaultTokenProviders();
 
 builder.Services.AddCors(options =>
     {
@@ -38,7 +42,10 @@ builder.Services.AddCors(options =>
 builder.Services.Configure<JwtConfiguration>(builder.Configuration.GetSection(nameof(JwtConfiguration)));
 var jwtConfig = builder.Configuration.GetSection(nameof(JwtConfiguration)).Get<JwtConfiguration>();
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+builder.Services.AddAuthentication(options => {
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;})
     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>{
         options.TokenValidationParameters = new ()
         {
@@ -52,15 +59,19 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy("BankAccountOwnerPolicy", policy =>
+    options.AddPolicy("CustomerPolicy", policy =>
     {
         policy.RequireAuthenticatedUser();
+        policy.RequireRole("Customer");
         policy.RequireClaim("userId");
+    });
+    options.AddPolicy("AdminPolicy", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.RequireRole("Admin");
     });
 });
 
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
-builder.Services.AddScoped<IRolesRepository, RolesRepository>();
 builder.Services.AddScoped<IUsersService, UsersService>();
 builder.Services.AddScoped<IBankAccountsRepository, BankAccountsRepository>();
 builder.Services.AddScoped<IBankCardsRepository, BankCardsRepository>();
@@ -68,7 +79,6 @@ builder.Services.AddScoped<IBankTransactionsRepository, BankTransactionsReposito
 builder.Services.AddScoped<IBankAccountsService, BankAccountsService>();
 builder.Services.AddScoped<IBankCardsService, BankCardsService>();
 builder.Services.AddScoped<IBankTransactionsService, BankTransactionsService>();
-builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 builder.Services.AddScoped<IJwtProvider, JwtProvider>();
 builder.Services.AddAutoMapper(typeof(BankAccountProfile));
 builder.Services.AddAutoMapper(typeof(BankCardProfile));

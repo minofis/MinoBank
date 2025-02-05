@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.BankAccountDtos;
 using MinoBank.API.Dtos.BankCardDtos;
-using MinoBank.Core.Entities;
 using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.API.Controllers
@@ -14,28 +13,44 @@ namespace MinoBank.API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IBankAccountsService _bankAccountsService;
-        public BankAccountsController(IBankAccountsService bankAccountsService, IMapper mapper)
+        private readonly IUsersService _usersService;
+        public BankAccountsController(IBankAccountsService bankAccountsService, IMapper mapper, IUsersService usersService)
         {
             _bankAccountsService = bankAccountsService;
             _mapper = mapper;
+            _usersService = usersService;
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
-        [HttpGet("by-current-user")]
-        public async Task<ActionResult<List<BankAccountResponseDto>>> GetBankAccountsByUser()
+        [Authorize(Policy = "AdminPolicy")]
+        [HttpGet]
+        public async Task<ActionResult<List<BankAccountResponseDto>>> GetAllBankAccounts()
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get all bank accounts
+            var bankAccounts = await _bankAccountsService.GetAllBankAccountsAsync();
 
-            // Check user id
+            // Map the bank accounts to a list of response DTOs
+            var bankAccountResponseDtos = _mapper.Map<List<BankAccountResponseDto>>(bankAccounts);
+
+            // Return a 200 Ok response with the list of bank accounts
+            return Ok(bankAccountResponseDtos);
+        }
+
+        [Authorize(Policy = "CustomerPolicy")]
+        [HttpGet("userId")]
+        public async Task<ActionResult<List<BankAccountResponseDto>>> GetBankAccountsByUserId()
+        {
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(User);
+
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
             }
             try
             {
-            // Get all bank accounts
-            var bankAccounts = await _bankAccountsService.GetBankAccountsByUserAsync(userId);
+            // Get all bank accounts 
+            var bankAccounts = await _bankAccountsService.GetBankAccountsByUserIdAsync(userId);
 
             // Map the bank accounts to a list of response DTOs
             var bankAccountResponseDtos = _mapper.Map<List<BankAccountResponseDto>>(bankAccounts);
@@ -55,14 +70,14 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet("{id}")]
-        public async Task<ActionResult<BankAccountResponseDto>> GetBankAccount(Guid id)
+        public async Task<ActionResult<BankAccountResponseDto>> GetBankAccountById(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -95,14 +110,14 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet("{id}/details")]
         public async Task<ActionResult<BankAccountDetailsResponseDto>> GetBankAccountDetails(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -136,14 +151,14 @@ namespace MinoBank.API.Controllers
         }
 
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet("{id}/bank-cards")]
         public async Task<ActionResult<List<BankCardResponseDto>>> GetBankCards(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -178,19 +193,18 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpPost]
         public async Task<ActionResult<BankAccountResponseDto>> Create([FromBody]BankAccountCreateRequestDto bankAccountDto)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
             }
-
             // Validate the incomming request
             if (bankAccountDto == null)
             {
@@ -215,22 +229,8 @@ namespace MinoBank.API.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             };
         }
-
-        [HttpGet]
-        public async Task<ActionResult<List<BankAccountResponseDto>>> GetBankAccounts()
-        {
-
-            // Get all bank accounts
-            var bankAccounts = await _bankAccountsService.GetAllBankAccountsAsync();
-
-            // Map the bank accounts to a list of response DTOs
-            var bankAccountResponseDtos = _mapper.Map<List<BankAccountResponseDto>>(bankAccounts);
-
-            // Return a 200 Ok response with the list of bank accounts
-            return Ok(bankAccountResponseDtos);
-        }
     }
-}
+} 
 /*
         [HttpPut]
         [Route("{id}/status")]

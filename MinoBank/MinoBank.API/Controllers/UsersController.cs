@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.UserDtos;
 using MinoBank.Core.Interfaces.Services;
@@ -58,6 +59,7 @@ namespace MinoBank.API.Controllers
                 // Register a new user
                 await _usersService.Register
                 (
+                    registerDto.UserName,
                     registerDto.FirstName,
                     registerDto.LastName,
                     registerDto.Age,
@@ -81,6 +83,7 @@ namespace MinoBank.API.Controllers
             };
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpGet("{id}")]
         public async Task<ActionResult<UserResponseDto>> GetUser(Guid id)
         {
@@ -107,12 +110,13 @@ namespace MinoBank.API.Controllers
             };
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("{id}/add-role")]
         public async Task<IActionResult> AddRoleToUser([FromQuery]string roleName, Guid id)
         {
             try
             {
-                await _usersService.AddRoleToUserAsync(id, roleName);
+                await _usersService.AssignRoleToUserAsync(id, roleName);
 
                 return Ok();
             }
@@ -128,6 +132,7 @@ namespace MinoBank.API.Controllers
             };
         }
 
+        [Authorize(Policy = "AdminPolicy")]
         [HttpPost("{id}/remove-role")]
         public async Task<IActionResult> RemoveRoleFromUser([FromQuery]string roleName, Guid id)
         {

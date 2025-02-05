@@ -1,6 +1,7 @@
+using Microsoft.AspNetCore.Identity;
 using MinoBank.Core.Entities;
+using MinoBank.Core.Entities.Identity;
 using MinoBank.Core.Enums.BankAccount;
-using MinoBank.Core.Enums.BankCard;
 using MinoBank.Core.Interfaces.Repositories;
 using MinoBank.Core.Interfaces.Services;
 
@@ -9,11 +10,11 @@ namespace MinoBank.Business.Services
     public class BankAccountsService : IBankAccountsService
     {
         private readonly IBankAccountsRepository _bankAccountsRepo;
-        private readonly IUsersRepository _usersRepo;
-        public BankAccountsService(IBankAccountsRepository bankAccountsRepo, IUsersRepository usersRepo)
+        private readonly UserManager<UserEntity>_userManager;
+        public BankAccountsService(IBankAccountsRepository bankAccountsRepo, UserManager<UserEntity> userManager)
         {
             _bankAccountsRepo = bankAccountsRepo;
-            _usersRepo = usersRepo;
+            _userManager = userManager;
         }
 
         public async Task<List<BankAccount>> GetAllBankAccountsAsync()
@@ -21,7 +22,7 @@ namespace MinoBank.Business.Services
             return await _bankAccountsRepo.GetAllBankAccountsAsync();
         }
 
-        public async Task<List<BankAccount>> GetBankAccountsByUserAsync(Guid userId)
+        public async Task<List<BankAccount>> GetBankAccountsByUserIdAsync(string userId)
         {
             var bankAccounts = await _bankAccountsRepo.GetBankAccountsByUserIdAsync(userId)
                 ?? throw new ArgumentException("This user doesn't have any bank accounts");
@@ -64,10 +65,10 @@ namespace MinoBank.Business.Services
             return bankAccountCards;
         }
 
-        public async Task CreateBankAccountAsync(Guid userId, BankAccountType type)
+        public async Task CreateBankAccountAsync(string userId, BankAccountType type)
         {
             // Get user by id
-            var user = await _usersRepo.GetUserByIdAsync(userId)
+            var user = await _userManager.FindByIdAsync(userId.ToString())
                 ?? throw new ArgumentException($"User with ID {userId} not found.");
 
             // Get bank accounts by user
@@ -84,11 +85,6 @@ namespace MinoBank.Business.Services
 
             // Add the bank account
             await _bankAccountsRepo.CreateBankAccountAsync(bankAccount);
-        }
-
-        public async Task DeleteBankAccountByIdAsync(Guid bankAccountId)
-        {
-            await _bankAccountsRepo.DeleteBankAccountByIdAsync(bankAccountId);
         }
 
         public async Task UpdateBankAccountStatusByIdAsync(Guid bankAccountId, BankAccountStatus newStatus)

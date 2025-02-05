@@ -1,6 +1,6 @@
 using AutoMapper;
 using MinoBank.API.Dtos.UserDtos;
-using MinoBank.Core.Entities;
+using MinoBank.Core.Entities.Identity;
 
 namespace MinoBank.API.Helpers
 {
@@ -8,8 +8,9 @@ namespace MinoBank.API.Helpers
     {
         public UserProfile()
         {
-            CreateMap<UserEntity, UserResponseDto>()
-                .ForMember(t => t.Roles, o => o.MapFrom(s => s.Roles));
+            CreateMap<UserEntity, UserResponseDto>();
+            
+            CreateMap<RoleEntity, RoleResponseDto>();
         }
     }
 }

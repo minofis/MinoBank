@@ -141,7 +141,7 @@ namespace MinoBank.Business.Services
             await _bankCardsRepo.SaveChangesAsync();
         }
 
-        public async Task CreateBankCardAsync(Guid userId, Guid bankAccountId, BankCardType type, CurrencyCode currencyCode)
+        public async Task CreateBankCardAsync(string userId, Guid bankAccountId, BankCardType type, CurrencyCode currencyCode)
         {
             // Get bank account by id
             var bankAccount = await _bankAccountsRepo.GetBankAccountByIdAsync(bankAccountId)

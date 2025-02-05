@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using MinoBank.Core.Entities;
+using MinoBank.Core.Entities.Identity;
 using MinoBank.Core.Interfaces.Auth;
 
 namespace MinoBank.Infrastructure.Helpers
@@ -15,12 +15,17 @@ namespace MinoBank.Infrastructure.Helpers
         {
             _configuration = configuration.Value;
         }
-        public string GenerateToken(UserEntity user)
+        public string GenerateToken(UserEntity user, IList<string> roles)
         {
-            var claims = new []
+            var claims = new List<Claim>
             {
-                new Claim("userId", user.Id.ToString())
+                new Claim("userId", user.Id)
             };
+
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim(ClaimTypes.Role, role));
+            }
 
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration.SecretKey));
 

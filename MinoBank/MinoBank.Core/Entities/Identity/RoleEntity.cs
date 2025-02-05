@@ -1,8 +1,6 @@
-namespace MinoBank.Core.Entities
+using Microsoft.AspNetCore.Identity;
+
+namespace MinoBank.Core.Entities.Identity
 {
-    public class RoleEntity 
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-    }
+    public class RoleEntity : IdentityRole {}
 }

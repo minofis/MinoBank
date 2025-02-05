@@ -1,4 +1,4 @@
-using MinoBank.Core.Entities;
+using MinoBank.Core.Entities.Identity;
 
 namespace MinoBank.API.Dtos.UserDtos
 {
@@ -11,6 +11,6 @@ namespace MinoBank.API.Dtos.UserDtos
         public int Age { get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
-        public List<RoleEntity> Roles { get; set; }
+        public List<RoleResponseDto> Roles { get; set; }
     }
 }

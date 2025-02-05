@@ -14,20 +14,36 @@ namespace MinoBank.API.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IBankCardsService _bankCardsService;
-        public BankCardsController(IBankCardsService bankCardsService, IMapper mapper)
+        private readonly IUsersService _usersService;
+        public BankCardsController(IBankCardsService bankCardsService, IMapper mapper, IUsersService usersService)
         {
             _bankCardsService = bankCardsService;
             _mapper = mapper;
+            _usersService = usersService;
+        }
+
+        [Authorize(Policy = "AdminPolicy")]
+        [HttpGet]
+        public async Task<ActionResult<List<BankCardResponseDto>>> GetAllBankCards()
+        {
+            // Get all bank cards
+            var bankCards = await _bankCardsService.GetAllBankCardsAsync();
+
+            // Map the bank cards to a list of response DTOs
+            var bankCardsResponseDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
+
+            // Return a 200 Ok response with the list of bank cards
+            return Ok(bankCardsResponseDtos);
         }
         
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet("{id}")]
         public async Task<ActionResult<BankCardResponseDto>> GetBankCard(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(HttpContext.User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -60,15 +76,15 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet]
         [Route("{id}/details")]
         public async Task<ActionResult<BankCardDetailsResponseDto>> GetBankCardDetailsById(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(HttpContext.User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -101,14 +117,14 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpPost]
         public async Task<ActionResult<BankCardResponseDto>> Create(BankCardCreateRequestDto bankCardDto)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(HttpContext.User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -139,14 +155,14 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet("{id}/sent-transactions")]
         public async Task<ActionResult<List<BankTransaction>>> GetSentTransactions(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(HttpContext.User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -181,14 +197,14 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpGet("{id}/recived-transactions")]
         public async Task<ActionResult<List<BankTransaction>>> GetRecivedTransactions(Guid id)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(HttpContext.User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -223,14 +239,14 @@ namespace MinoBank.API.Controllers
             };
         }
 
-        [Authorize(Policy = "BankAccountOwnerPolicy")]
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpPost("{id}/top-up")]
         public async Task<ActionResult> TopUpCard(Guid id, [FromQuery] decimal topUpAmount)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(HttpContext.User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -267,16 +283,15 @@ namespace MinoBank.API.Controllers
             };
         }
 
+        [Authorize(Policy = "CustomerPolicy")]
         [HttpPost]
         [Route("{id}/funds-transfer")]
-        public async Task<ActionResult> FundsTransfer(
-            Guid id,
-            [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
+        public async Task<ActionResult> FundsTransfer(Guid id, [FromBody]BankTransactionCreateRequestDto bankTransactionDto)
         {
-            // Get user id from the jwt token
-            var userId = Guid.Parse(User.FindFirst("userId")?.Value);
+            // Get user id from the current user
+            var userId = await _usersService.GetUserIdAsync(User);
 
-            // Check user id
+            // Check if userId is null
             if (userId == null)
             {
                 return Unauthorized("User isn't authenticated");
@@ -314,19 +329,6 @@ namespace MinoBank.API.Controllers
                 // Return a 500 Internal Server Error with the error message
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             };
-        }
-
-        [HttpGet]
-        public async Task<ActionResult<List<BankCardResponseDto>>> GetAllBankCards()
-        {
-            // Get all bank cards
-            var bankCards = await _bankCardsService.GetAllBankCardsAsync();
-
-            // Map the bank cards to a list of response DTOs
-            var bankCardsResponseDtos = _mapper.Map<List<BankCardResponseDto>>(bankCards);
-
-            // Return a 200 Ok response with the list of bank cards
-            return Ok(bankCardsResponseDtos);
         }
     }
 }

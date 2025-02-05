@@ -1,11 +1,12 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MinoBank.API.Dtos.BankTransactionDtos;
 using MinoBank.Core.Interfaces.Services;
 
 namespace MinoBank.API.Controllers
 {
-/*
+    [Authorize(Policy = "AdminPolicy")]
     [ApiController]
     [Route("minobank/[controller]")]
     public class BankTransactionsController : ControllerBase
@@ -57,5 +58,4 @@ namespace MinoBank.API.Controllers
             };
         }
     }
-*/
 }
